@@ -1,0 +1,17 @@
+{
+  "print_every": 1,
+  "save_every": 1,
+
+  "data_dir": "../data/processed",
+
+  "d_model": 128,
+  "nlayers": 3,
+  "nhead": 4,
+  "nhid": 512,
+  "dropout_prob": 0.1,
+  "lr": 0.001,
+  "clip_grads": true,
+
+  "batch_size": 1,
+  "epochs": 15
+}

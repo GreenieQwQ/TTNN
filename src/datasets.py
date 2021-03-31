@@ -184,7 +184,7 @@ class IndexedInputTargetTranslationDatasetOnTheFly:
     def preprocess(source_dictionary):
 
         def preprocess_function(source):
-            source_tokens = source.strip().split()
+            source_tokens = list(source.strip())
             indexed_source = source_dictionary.index_sentence(source_tokens)
             return indexed_source
 
@@ -233,7 +233,7 @@ class IndexedInputTargetTranslationDataset:
     def preprocess(source_dictionary):
 
         def preprocess_function(source):
-            source_tokens = source.strip().split()
+            source_tokens = list(source.strip())
             indexed_source = source_dictionary.index_sentence(source_tokens)
             return indexed_source
 

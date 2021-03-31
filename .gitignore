@@ -1,3 +1,5 @@
 checkpoints
-data
+data/prediction
+data/processed
 logs
+想法.md

@@ -7,7 +7,7 @@ PAD_TOKEN = '<PAD>'
 UNK_TOKEN = '<UNK>'
 START_TOKEN = '<SOS>'
 END_TOKEN = '<EOS>'
-
+special_tokens = [PAD_TOKEN, UNK_TOKEN, START_TOKEN, END_TOKEN]
 
 class IndexDictionary:
 
