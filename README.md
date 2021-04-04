@@ -36,6 +36,24 @@ $ python translate.py --config=../checkpoints/config.json --checkpoint=../checkp
 
 It will give you prediction of the given formula in input path and dump the output at the output path.
 
+Example:
+
+Input file:
+```
+&UabUa!b
+&&&Ua&bcUa&!bcUa&b!cUa&!b!c
+&&G>aFdW!fWfW!fWfG!f>FcU!c&cW!bWbW!bWbG!b
+&&&&&&&G>&&b!aFaUcaG>aGc>FbU!b&bW!fWfW!fWfG!f>FaU>&cXU!aeXU!a&eFfaFcG>&aFeU!&&!efXU!e&!ed|ec|G!aF&aW!fdG>eG!c
+```
+
+The output file is as follows:
+```
+&a!b;{1}
+&a!b;b;{1}
+{!a&!f|!f|!c&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&!f}
+{!a&!f|!f|!c&d&d&d&d&d&d&d&d&!f}
+```
+
 ### Evaluate
 
 To evaluate the prediction with the ground truth and the source ltl formula:
