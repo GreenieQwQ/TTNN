@@ -1,6 +1,6 @@
 {
   "print_every": 1,
-  "save_every": 1,
+  "save_every": 5,
 
   "data_dir": "../data/processed",
 
