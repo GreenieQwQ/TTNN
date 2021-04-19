@@ -25,14 +25,12 @@ Below are the provided example data files.
 - `tgt-train.txt`
 - `src-val.txt`
 - `tgt-val.txt`
-  
-The test file is as follows.
-- `test.txt`
+
 
 ### Predict
 To predict a satisfying trace from the source postfix ltl formula:
 ```
-$ python translate.py --config=../checkpoints/config.json --checkpoint=../checkpoints/bestModel.pth --input=../data/test/test.txt
+$ python translate.py --config=../checkpoints/config.json --checkpoint=../checkpoints/bestModel.pth
 ```
 
 It will give you prediction of the given formula in input path and dump the output at the output path.
@@ -59,7 +57,7 @@ The output file is as follows:
 
 To evaluate the prediction with the ground truth and the source ltl formula:
 ```
-$ python evaluate.py --pred=../data/prediction/pred.txt --src=../data/test/test.txt --gd=../data/raw/tgt-train.txt
+$ python evaluate.py --postfix={ModelName}
 ```
 
 It will output the syntactic accuracy and semantic accuracy.
