@@ -13,6 +13,7 @@ TEACHING TEMPORAL LOGICS TO NEURAL NETWORKS
 ### Prepare datasets
 This repo comes with example data in `data/` directory. To begin, you will need to prepare datasets with given data as follows:
 ```
+$ python processRaw.py
 $ python prepare_datasets.py
 ```
 
