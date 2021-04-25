@@ -21,6 +21,7 @@ parser = ArgumentParser(description='Train Transformer')
 parser.add_argument('--config', type=str, default=None)
 
 parser.add_argument('--data_dir', type=str, default='../data/processed')
+parser.add_argument("--postfix", type=str, required=True)
 parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
@@ -65,8 +66,9 @@ def run_trainer(config):
     logger.info(config)
 
     logger.info('Constructing dictionaries...')
-    source_dictionary = IndexDictionary.load(config['data_dir'], mode='source')
-    target_dictionary = IndexDictionary.load(config['data_dir'], mode='target')
+    data_dir = config['data_dir'] + "-" + args.postfix
+    source_dictionary = IndexDictionary.load(data_dir, mode='source')
+    target_dictionary = IndexDictionary.load(data_dir, mode='target')
     logger.info(f'Source dictionary vocabulary : {source_dictionary.vocabulary_size} tokens')
     logger.info(f'Target dictionary vocabulary : {target_dictionary.vocabulary_size} tokens')
 
@@ -83,11 +85,11 @@ def run_trainer(config):
 
     logger.info('Loading datasets...')
     train_dataset = IndexedInputTargetTranslationDataset(
-        data_dir=config['data_dir'],
+        data_dir=data_dir,
         phase='train')
 
     val_dataset = IndexedInputTargetTranslationDataset(
-        data_dir=config['data_dir'],
+        data_dir=data_dir,
         phase='val')
 
     train_dataloader = DataLoader(
