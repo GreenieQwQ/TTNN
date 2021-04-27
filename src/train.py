@@ -19,14 +19,13 @@ import random
 
 parser = ArgumentParser(description='Train Transformer')
 parser.add_argument('--config', type=str, default=None)
-
 parser.add_argument('--data_dir', type=str, default='../data/processed')
 parser.add_argument("--postfix", type=str, required=True)
 parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
-parser.add_argument('--device', type=str, default='cuda:1' if torch.cuda.is_available() else 'cpu')
+parser.add_argument('--device', type=str, default='cuda:0' if torch.cuda.is_available() else 'cpu')
 
 parser.add_argument('--print_every', type=int, default=1)
 parser.add_argument('--save_every', type=int, default=1)

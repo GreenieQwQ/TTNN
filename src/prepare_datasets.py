@@ -22,7 +22,7 @@ args.val_source = args.val_source.format(prefix=args.postfix)
 args.val_target = args.val_target.format(prefix=args.postfix)
 TranslationDataset.prepare(args.train_source, args.train_target, args.val_source, args.val_target, save_data_dir)
 translation_dataset = TranslationDataset(save_data_dir, 'train')
-translation_dataset_on_the_fly = TranslationDatasetOnTheFly('train')
+translation_dataset_on_the_fly = TranslationDatasetOnTheFly('train', args.postfix)
 assert translation_dataset[0] == translation_dataset_on_the_fly[0]
 
 tokenized_dataset = TokenizedTranslationDataset(save_data_dir, 'train')
@@ -49,7 +49,7 @@ target_dictionary = IndexDictionary.load(save_data_dir, mode='target')
 
 IndexedInputTargetTranslationDataset.prepare(save_data_dir, source_dictionary, target_dictionary)
 indexed_translation_dataset = IndexedInputTargetTranslationDataset(save_data_dir, 'train')
-indexed_translation_dataset_on_the_fly = IndexedInputTargetTranslationDatasetOnTheFly('train', source_dictionary, target_dictionary)
+indexed_translation_dataset_on_the_fly = IndexedInputTargetTranslationDatasetOnTheFly('train', source_dictionary, target_dictionary, args.postfix)
 assert indexed_translation_dataset[0] == indexed_translation_dataset_on_the_fly[0]
 
 print('Done datasets preparation.')

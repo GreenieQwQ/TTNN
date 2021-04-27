@@ -41,11 +41,11 @@ if __name__ == "__main__":
     mode = args.mode
     print(f"Postfix: {args.postfix}\tChallenge: {isChallenge}\tMode: {mode}")
 
-    prefixes = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    prefixes = ["5t20", "20t35", "35t50", "50t65", "65t80", "80t105"]
     gd_dir = "../data/test"
-    gd_name = "{prefix}ltl-origin-test.json" if not isChallenge else "{prefix}ltl-origin-{mode}.json"
+    gd_name = "ltl{prefix}-origin-test.json" if not isChallenge else "{prefix}ltl-origin-{mode}.json"
     pred_dir = "../data/prediction"
-    pred_name = "{prefix}ltl-{postfix}ltl.txt" if not isChallenge else "{prefix}ltl-{mode}-{postfix}ltl.txt"
+    pred_name = "{prefix}src-{postfix}.txt" if not isChallenge else "{prefix}ltl-{mode}-{postfix}ltl.txt"
     postfix = args.postfix
     for prefix in prefixes:
         gd_path = os.path.join(gd_dir, gd_name.format(prefix=prefix, mode=mode))
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         resultPath = "../data/result_statistics"
         if not os.path.isdir(resultPath):
             os.makedirs(resultPath)
-        path = os.path.join(resultPath, f"{prefix}ltl-{postfix}ltl_result.json")
+        path = os.path.join(resultPath, f"{prefix}src-{postfix}_result.json")
         result = {}
         with open(pred_path, 'r', encoding='utf-8') as predFile:
             for i, pred in tqdm(enumerate(predFile), desc="Evaluating"):

@@ -255,4 +255,3 @@ if __name__ == '__main__':
     aggregate_prefixes(_5t20)
     aggregate_prefixes(_5t35)
     aggregate_prefixes(_5t50)
-

@@ -8,17 +8,17 @@ BASE_DIR = ".."
 # for test
 class TranslationDatasetOnTheFly:
 
-    def __init__(self, phase, limit=None):
+    def __init__(self, phase, postfix, limit=None):
         assert phase in ('train', 'val'), "Dataset phase must be either 'train' or 'val'"
 
         self.limit = limit
 
         if phase == 'train':
-            source_filepath = join(BASE_DIR, 'data', 'raw', 'src-train.txt')
-            target_filepath = join(BASE_DIR, 'data', 'raw', 'tgt-train.txt')
+            source_filepath = join(BASE_DIR, 'data', 'raw', postfix + '-src-train.txt')
+            target_filepath = join(BASE_DIR, 'data', 'raw', postfix + '-tgt-train.txt')
         elif phase == 'val':
-            source_filepath = join(BASE_DIR, 'data',  'raw', 'src-val.txt')
-            target_filepath = join(BASE_DIR, 'data',  'raw', 'tgt-val.txt')
+            source_filepath = join(BASE_DIR, 'data',  'raw', postfix + '-src-val.txt')
+            target_filepath = join(BASE_DIR, 'data',  'raw', postfix + '-tgt-val.txt')
         else:
             raise NotImplementedError()
 
@@ -99,9 +99,9 @@ class TranslationDataset:
 
 class TokenizedTranslationDatasetOnTheFly:
 
-    def __init__(self, phase, limit=None):
+    def __init__(self, phase, postfix, limit=None):
 
-        self.raw_dataset = TranslationDatasetOnTheFly(phase, limit)
+        self.raw_dataset = TranslationDatasetOnTheFly(phase, postfix, limit)
 
     def __getitem__(self, item):
         raw_source, raw_target = self.raw_dataset[item]
@@ -131,8 +131,8 @@ class TokenizedTranslationDataset:
 
 class InputTargetTranslationDatasetOnTheFly:
 
-    def __init__(self, phase, limit=None):
-        self.tokenized_dataset = TokenizedTranslationDatasetOnTheFly(phase, limit)
+    def __init__(self, phase, postfix, limit=None):
+        self.tokenized_dataset = TokenizedTranslationDatasetOnTheFly(phase, postfix, limit)
 
     def __getitem__(self, item):
         tokenized_source, tokenized_target = self.tokenized_dataset[item]
@@ -163,9 +163,9 @@ class InputTargetTranslationDataset:
 
 class IndexedInputTargetTranslationDatasetOnTheFly:
 
-    def __init__(self, phase, source_dictionary, target_dictionary, limit=None):
+    def __init__(self, phase, source_dictionary, target_dictionary, postfix, limit=None):
 
-        self.input_target_dataset = InputTargetTranslationDatasetOnTheFly(phase, limit)
+        self.input_target_dataset = InputTargetTranslationDatasetOnTheFly(phase, postfix, limit)
         self.source_dictionary = source_dictionary
         self.target_dictionary = target_dictionary
 

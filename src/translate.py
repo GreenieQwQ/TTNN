@@ -44,17 +44,28 @@ parser.add_argument('--challenge', action="store_true",
 
 args = parser.parse_args()
 postfix = args.postfix
-if postfix == "5t20ltl":
-    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_17_21_08_25"
-    model_path = "epoch=092-val_loss=0.0653-val_metrics=1.07-0.979.pth"
-elif postfix == "5t35ltl":
-    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_18_17_09_21"
-    model_path = "epoch=092-val_loss=0.0903-val_metrics=1.09-0.971.pth"
-elif postfix == "5t50ltl":
-    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_19_13_13_55"
-    model_path = "epoch=086-val_loss=0.108-val_metrics=1.11-0.965.pth"
+if postfix == "5t20":
+    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_25_21_52_56"
+    model_path = "epoch=064-val_loss=0.0789-val_metrics=1.08-0.975.pth"
+elif postfix == "5t35":
+    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_25_21_55_43"
+    model_path = "epoch=063-val_loss=0.126-val_metrics=1.13-0.959.pth"
+elif postfix == "5t50":
+    model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_26_10_49_10"
+    model_path = "epoch=088-val_loss=0.165-val_metrics=1.18-0.946.pth"
 else:
     model_dir, model_path = None, None
+# if postfix == "5t20ltl":
+#     model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_17_21_08_25"
+#     model_path = "epoch=092-val_loss=0.0653-val_metrics=1.07-0.979.pth"
+# elif postfix == "5t35ltl":
+#     model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_18_17_09_21"
+#     model_path = "epoch=092-val_loss=0.0903-val_metrics=1.09-0.971.pth"
+# elif postfix == "5t50ltl":
+#     model_dir = "../checkpoints/d_model=128-layers_count=8-heads_count=4-FC_size=512-lr=0.00025-2021_04_19_13_13_55"
+#     model_path = "epoch=086-val_loss=0.108-val_metrics=1.11-0.965.pth"
+# else:
+#     model_dir, model_path = None, None
 
 config_path = os.path.join(model_dir, "config.json")
 with open(config_path) as f:
@@ -63,7 +74,7 @@ with open(config_path) as f:
 checkpoint_path = os.path.join(model_dir, model_path)
 print(f"Using model: {os.path.basename(checkpoint_path)}")
 
-dictionary_dir = config['data_dir'] + "_" + postfix
+dictionary_dir = config['data_dir'] + "-" + postfix
 print(f'Constructing dictionaries from {dictionary_dir}...')
 source_dictionary = IndexDictionary.load(dictionary_dir, mode='source')
 target_dictionary = IndexDictionary.load(dictionary_dir, mode='target')
@@ -85,7 +96,8 @@ def main():
     is_challenge = args.challenge
     mode = args.mode
     for the_input_file in input_files:
-        input_file = "../data/test/" + the_input_file + (f"ltl-src-{mode}.txt" if is_challenge else "ltl-src-test.txt")
+        # input_file = "../data/test/" + the_input_file + (f"ltl-src-{mode}.txt" if is_challenge else "ltl-src-test.txt")
+        input_file = f"../data/test/ltl{the_input_file}-src-test.txt"
         print(f"Translating: {input_file}")
         # 作用：将src进行index
         preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
@@ -103,7 +115,7 @@ def main():
         if not os.path.isdir(outputDir):
             os.makedirs(outputDir)
 
-        output_filename = the_input_file + (f"ltl-{mode}-{postfix}.txt" if is_challenge else f"ltl-{postfix}.txt")
+        output_filename = the_input_file + (f"src-{mode}-{postfix}.txt" if is_challenge else f"src-{postfix}.txt")
         output_path = os.path.join(outputDir, output_filename)
         print(f"Output to {output_path}:")
         with open(output_path, 'w', encoding='utf-8') as outFile:
@@ -123,4 +135,43 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    # 80t105
+    # the_input_file = "80t105"
+    # is_challenge = args.challenge
+    # mode = args.mode
+    # input_file = f"../data/test/ltl{the_input_file}-src-test.txt"
+    # print(f"Translating: {input_file}")
+    # # 作用：将src进行index
+    # preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
+    # # 作用：将输出逆index为句子
+    # postprocess = lambda x: ''.join(
+    #     [token for token in target_dictionary.tokenize_indexes(x) if token != END_TOKEN])
+    # device = torch.device('cuda:1' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
+    # translator = Translator(
+    #     model=model,
+    #     beam_size=args.beam_size,
+    #     max_seq_len=args.max_seq_len).to(device)
+    #
+    # # 目录
+    # outputDir = "../data/prediction"
+    # if not os.path.isdir(outputDir):
+    #     os.makedirs(outputDir)
+    #
+    # output_filename = the_input_file + (f"src-{mode}-{postfix}.txt" if is_challenge else f"src-{postfix}.txt")
+    # output_path = os.path.join(outputDir, output_filename)
+    # print(f"Output to {output_path}:")
+    # with open(output_path, 'w', encoding='utf-8') as outFile:
+    #     with open(input_file, 'r', encoding='utf-8') as inFile:
+    #         for seq in tqdm(inFile):
+    #             src_seq = preprocess(seq)
+    #             pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
+    #             pred_line = postprocess(pred_seq)
+    #             pred_line = pred_line.replace(START_TOKEN, '').replace(END_TOKEN, '')
+    #             # print(pred_line)
+    #             outFile.write(pred_line.strip() + '\n')
+    # print('[Info] Finished.')
+    # if is_challenge:
+    #     print(f'[Info] {mode} Finished.')
+    # else:
+    #     print('[Info] Random Finished.')
