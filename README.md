@@ -7,6 +7,7 @@ TEACHING TEMPORAL LOGICS TO NEURAL NETWORKS
 - [PyTorch 4.1+](http://pytorch.org/)
 - [NumPy](http://www.numpy.org/)
 - [tqdm](https://github.com/tqdm/tqdm)
+- [transformers](https://github.com/huggingface/transformers)
 
 ## Usage
 
