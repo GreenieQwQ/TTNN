@@ -20,12 +20,14 @@ import random
 parser = ArgumentParser(description='Train Transformer')
 parser.add_argument('--config', type=str, default=None)
 parser.add_argument('--data_dir', type=str, default='../data/processed')
-parser.add_argument("--postfix", type=str, required=True)
+# parser.add_argument("--postfix", type=str, required=True)
+parser.add_argument("--dn", type=str, required=True, help="data name")
+parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
-parser.add_argument('--device', type=str, default='cuda:0' if torch.cuda.is_available() else 'cpu')
+parser.add_argument('--device', type=str, default='cuda:1' if torch.cuda.is_available() else 'cpu')
 
 parser.add_argument('--print_every', type=int, default=1)
 parser.add_argument('--save_every', type=int, default=1)
@@ -50,6 +52,8 @@ def run_trainer(config):
     torch.manual_seed(0)
 
     run_name_format = (
+        f"data={data_name}-"
+        f"range={range_name}-"
         "d_model={d_model}-"
         "layers_count={nlayers}-"
         "heads_count={nhead}-"
@@ -65,7 +69,7 @@ def run_trainer(config):
     logger.info(config)
 
     logger.info('Constructing dictionaries...')
-    data_dir = config['data_dir'] + "-" + args.postfix
+    data_dir = config['data_dir'] + "-" + data_name + "-" + range_name
     source_dictionary = IndexDictionary.load(data_dir, mode='source')
     target_dictionary = IndexDictionary.load(data_dir, mode='target')
     logger.info(f'Source dictionary vocabulary : {source_dictionary.vocabulary_size} tokens')
@@ -129,7 +133,8 @@ def run_trainer(config):
 if __name__ == '__main__':
 
     args = parser.parse_args()
-
+    data_name = args.dn
+    range_name = args.rn
     if args.config is not None:
         with open(args.config, encoding='utf-8') as f:
             config = json.load(f)

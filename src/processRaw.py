@@ -68,7 +68,7 @@ def writeData(d, src_path):
                     tgt.write(data['trace'].replace("\"", "").replace(",", ";") + '\n')
                     origin_index.append(i)
     # endwith
-    # write origin
+    # write origin json
     df.loc[origin_index].reset_index(drop=True).to_json(origin_path)
     print(f"Writing to {src_path}...")
     # endwith
@@ -182,7 +182,7 @@ def countTimeOp(dataframe):
     vocab = re.compile(vocab)
     result = {}
     for i in trange(len(dataframe), desc="Counting"):
-        data = df.loc[i]
+        data = dataframe.loc[i]
         if data.get('ltl_pre', -1) == -1 or data['trace'] == "unsat" or data['trace'] is None:
             continue
         ltl = data['ltl_pre']
@@ -223,35 +223,61 @@ def aggregate_prefixes(prefixes):
     print("Done.")
 
 
-if __name__ == '__main__':
-    prefixes = ["ltl5t20", "ltl20t35", "ltl35t50", "ltl50t65", "ltl65t80", "ltl80t105"]
-    for prefix in prefixes:
-        print(f"{prefix}:")
-        train_path = f"../data/raw/{prefix}-src-train.txt"
-        val_path = f"../data/raw/{prefix}-src-val.txt"
-        test_path = f"../data/test/{prefix}-src-test.txt"
-        # aggregate data
-        # print("Reading File...")
-        # df = fetch_challenge(prefix=prefix, outputName="easy.json")
-        df = fetch_spec(prefix=prefix)
-        # df = fetch_spec("", "../data/random_data")
-        # df = fetch_all()
-        print(f"Remaining data count: {len(df)}.")
-        # save data for test
-        # df.to_json(shuffled_path)
-        #  We split this set into an 80% training set, a 10% validation set, and a 10% test set.
-        # trainSet, validateSet, testSet = processData(df)
-        trainSet, validateSet, testSet = process_spec(df)
-        # countTimeOp(testSet)
-        writeData(trainSet, train_path)
-        writeData(validateSet, val_path)
-        writeData(testSet, test_path)
-        print("Done.")
+# 功能：读取以{数据集}-{xtx}命名文件夹内的train、val数据集，并且处理成便于训练的raw数据，输出到processed-{数据集}-{xtx}文件夹下
+def processRawData(file_dir):
+    rawDir = file_dir + "-raw"
+    if not os.path.isdir(rawDir):
+        os.makedirs(rawDir)
+    train_path = os.path.join(rawDir, "src-train.txt")
+    val_path = os.path.join(rawDir, "src-val.txt")
+    test_path = os.path.join(rawDir, "src-test.txt")
+    file_list = os.listdir(file_dir)
+    for f in file_list:
+        path = os.path.join(file_dir, f)
+        if f.endswith(".json"):
+            df = pd.read_json(path)
+            if f.endswith("train.json"):
+                writeData(df, train_path)
+            if f.endswith("val.json"):
+                writeData(df, val_path)
+            if f.endswith("test.json"):
+                writeData(df, test_path)
+        # endif
     # endfor
 
-    _5t20 = ["ltl5t20"]
-    _5t35 = ["ltl5t20", "ltl20t35"]
-    _5t50 = ["ltl5t20", "ltl20t35", "ltl35t50"]
-    aggregate_prefixes(_5t20)
-    aggregate_prefixes(_5t35)
-    aggregate_prefixes(_5t50)
+
+if __name__ == '__main__':
+    data_name = "trp"
+    range_name = "50t65"
+    processRawData(f"../data/{data_name}-{range_name}")
+    # prefixes = ["ltl5t20", "ltl20t35", "ltl35t50", "ltl50t65", "ltl65t80", "ltl80t105"]
+    # for prefix in prefixes:
+    #     print(f"{prefix}:")
+    #     train_path = f"../data/raw/{prefix}-src-train.txt"
+    #     val_path = f"../data/raw/{prefix}-src-val.txt"
+    #     test_path = f"../data/test/{prefix}-src-test.txt"
+    #     # aggregate data
+    #     # print("Reading File...")
+    #     # df = fetch_challenge(prefix=prefix, outputName="easy.json")
+    #     df = fetch_spec(prefix=prefix)
+    #     # df = fetch_spec("", "../data/random_data")
+    #     # df = fetch_all()
+    #     print(f"Remaining data count: {len(df)}.")
+    #     # save data for test
+    #     # df.to_json(shuffled_path)
+    #     #  We split this set into an 80% training set, a 10% validation set, and a 10% test set.
+    #     # trainSet, validateSet, testSet = processData(df)
+    #     trainSet, validateSet, testSet = process_spec(df)
+    #     # countTimeOp(testSet)
+    #     writeData(trainSet, train_path)
+    #     writeData(validateSet, val_path)
+    #     writeData(testSet, test_path)
+    #     print("Done.")
+    # # endfor
+    #
+    # _5t20 = ["ltl5t20"]
+    # _5t35 = ["ltl5t20", "ltl20t35"]
+    # _5t50 = ["ltl5t20", "ltl20t35", "ltl35t50"]
+    # aggregate_prefixes(_5t20)
+    # aggregate_prefixes(_5t35)
+    # aggregate_prefixes(_5t50)
