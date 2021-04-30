@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from tqdm import tqdm
 from runautom import runAutom
+from ltl_model_check import check
 
 parser = argparse.ArgumentParser()
 # parser.add_argument('--pred', required=True,
@@ -32,6 +33,10 @@ def syntactic_acc(pred: str, gd: str):
 
 def semantic_acc(pred: str, df):
     refined_pred = pred.replace(";", ",")
+    # TODO: vocab的设置
+    # vocab = [i for i in "abcdefghij]
+    # print(f"Vocab is: {vocab}.")
+    # return check(df['ltl'], pred, vocab)
     return runAutom(df['APs'], df['States'],
                     df['Transform'], df['Accept'], df['Start'], refined_pred)
 
