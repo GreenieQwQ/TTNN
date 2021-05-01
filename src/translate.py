@@ -14,27 +14,15 @@ from tqdm import tqdm
 
 parser = ArgumentParser(description='Predict translation')
 parser.add_argument('--source', type=str)
-# parser.add_argument('--config', type=str,
-#                     default=os.path.join(model_dir, "config.json"))
-# parser.add_argument('--checkpoint', type=str,
-#                     default=os.path.join(model_dir, model_path))
-# parser.add_argument('--input', required=True,
-#                     help='Input for prediction.')
-# parser.add_argument('--output', default='../data/prediction/20t35ltl.txt',
-#                     help="""Path to output the predictions (each line will
-#                         be the decoded sequence""")
+parser.add_argument("--dn", type=str, required=True, help="data name")
+parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument('--beam_size', type=int, default=3)
 parser.add_argument('--max_seq_len', type=int, default=100)
 parser.add_argument('--no_cuda', action='store_true')
 parser.add_argument('--postfix', type=str, required=True)
-parser.add_argument('--mode', type=str, required=True)
-parser.add_argument('--challenge', action="store_true",
-                    help='Activate challenge mode.')
-# TODO: Translate bpe encoded files
-# parser.add_argument('-src', required=True,
-#                    help='Source sequence to decode (one line per sequence)')
-# parser.add_argument('-vocab', required=True,
-#                    help='Source sequence to decode (one line per sequence)')
+# parser.add_argument('--mode', type=str, required=True)
+# parser.add_argument('--challenge', action="store_true",
+#                     help='Activate challenge mode.')
 # TODO: Batch translation
 # parser.add_argument('-batch_size', type=int, default=30,
 #                    help='Batch size')
@@ -74,7 +62,9 @@ with open(config_path) as f:
 checkpoint_path = os.path.join(model_dir, model_path)
 print(f"Using model: {os.path.basename(checkpoint_path)}")
 
-dictionary_dir = config['data_dir'] + "-" + postfix
+data_name = args.dn
+range_name = args.rn
+dictionary_dir = config['data_dir'] + "-" + data_name + "-" + range_name
 print(f'Constructing dictionaries from {dictionary_dir}...')
 source_dictionary = IndexDictionary.load(dictionary_dir, mode='source')
 target_dictionary = IndexDictionary.load(dictionary_dir, mode='target')
@@ -91,14 +81,55 @@ checkpoint = torch.load(checkpoint_filepath, map_location='cpu')
 model.load_state_dict(checkpoint)
 
 
-def main():
-    input_files = ["5t20", "20t35", "35t50", "50t65", "65t80"]
-    is_challenge = args.challenge
-    mode = args.mode
-    for the_input_file in input_files:
-        # input_file = "../data/test/" + the_input_file + (f"ltl-src-{mode}.txt" if is_challenge else "ltl-src-test.txt")
-        input_file = f"../data/test/ltl{the_input_file}-src-test.txt"
-        print(f"Translating: {input_file}")
+# def main():
+    # input_files = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    # is_challenge = args.challenge
+    # mode = args.mode
+    # for the_input_file in input_files:
+    #     # input_file = "../data/test/" + the_input_file + (f"ltl-src-{mode}.txt" if is_challenge else "ltl-src-test.txt")
+    #     input_file = f"../data/test/ltl{the_input_file}-src-test.txt"
+    #     print(f"Translating: {input_file}")
+    #     # 作用：将src进行index
+    #     preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
+    #     # 作用：将输出逆index为句子
+    #     postprocess = lambda x: ''.join(
+    #         [token for token in target_dictionary.tokenize_indexes(x) if token != END_TOKEN])
+    #     device = torch.device('cuda:1' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
+    #     translator = Translator(
+    #         model=model,
+    #         beam_size=args.beam_size,
+    #         max_seq_len=args.max_seq_len).to(device)
+    #
+    #     # 目录
+    #     outputDir = "../data/prediction"
+    #     if not os.path.isdir(outputDir):
+    #         os.makedirs(outputDir)
+    #
+    #     output_filename = the_input_file + (f"src-{mode}-{postfix}.txt" if is_challenge else f"src-{postfix}.txt")
+    #     output_path = os.path.join(outputDir, output_filename)
+    #     print(f"Output to {output_path}:")
+    #     with open(output_path, 'w', encoding='utf-8') as outFile:
+    #         with open(input_file, 'r', encoding='utf-8') as inFile:
+    #             for seq in tqdm(inFile):
+    #                 src_seq = preprocess(seq)
+    #                 pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
+    #                 pred_line = postprocess(pred_seq)
+    #                 pred_line = pred_line.replace(START_TOKEN, '').replace(END_TOKEN, '')
+    #                 # print(pred_line)
+    #                 outFile.write(pred_line.strip() + '\n')
+    #     print('[Info] Finished.')
+    # if is_challenge:
+    #     print(f'[Info] {mode} Finished.')
+    # else:
+    #     print('[Info] Random Finished.')
+
+# 功能：对data name里所有的rn进行测试
+def main(dn):
+    dir_name_format = "../data/{dn}-{rn}"
+    range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    for rn in range_names:
+        dir_name = dir_name_format.format(dn=dn, rn=rn)
+        input_path = os.path.join(dir_name, "src-test.txt")
         # 作用：将src进行index
         preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
         # 作用：将输出逆index为句子
@@ -111,15 +142,15 @@ def main():
             max_seq_len=args.max_seq_len).to(device)
 
         # 目录
-        outputDir = "../data/prediction"
+        outputDir = f"../data/prediction-{dn}-{rn}"
         if not os.path.isdir(outputDir):
             os.makedirs(outputDir)
 
-        output_filename = the_input_file + (f"src-{mode}-{postfix}.txt" if is_challenge else f"src-{postfix}.txt")
+        output_filename = "prediction.txt"
         output_path = os.path.join(outputDir, output_filename)
         print(f"Output to {output_path}:")
         with open(output_path, 'w', encoding='utf-8') as outFile:
-            with open(input_file, 'r', encoding='utf-8') as inFile:
+            with open(input_path, 'r', encoding='utf-8') as inFile:
                 for seq in tqdm(inFile):
                     src_seq = preprocess(seq)
                     pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
@@ -128,13 +159,11 @@ def main():
                     # print(pred_line)
                     outFile.write(pred_line.strip() + '\n')
         print('[Info] Finished.')
-    if is_challenge:
-        print(f'[Info] {mode} Finished.')
-    else:
-        print('[Info] Random Finished.')
 
 
 if __name__ == "__main__":
+    # 对自己分布进行测试
+    main(data_name)
     # main()
     # 80t105
     # the_input_file = "80t105"

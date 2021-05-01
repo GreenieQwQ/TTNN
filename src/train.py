@@ -27,7 +27,7 @@ parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
-parser.add_argument('--device', type=str, default='cuda:1' if torch.cuda.is_available() else 'cpu')
+parser.add_argument('--device', type=str, default='cuda:0' if torch.cuda.is_available() else 'cpu')
 
 parser.add_argument('--print_every', type=int, default=1)
 parser.add_argument('--save_every', type=int, default=1)
@@ -68,8 +68,8 @@ def run_trainer(config):
     logger.info(f'Run name : {run_name}')
     logger.info(config)
 
-    logger.info('Constructing dictionaries...')
     data_dir = config['data_dir'] + "-" + data_name + "-" + range_name
+    logger.info(f'Constructing dictionaries from {data_dir}...')
     source_dictionary = IndexDictionary.load(data_dir, mode='source')
     target_dictionary = IndexDictionary.load(data_dir, mode='target')
     logger.info(f'Source dictionary vocabulary : {source_dictionary.vocabulary_size} tokens')
