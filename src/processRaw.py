@@ -7,8 +7,6 @@ import re
 
 seed = 114514
 
-
-
 # 输入：存储数据的json、分裂的ratio
 # 输出：训练集trainDataSet、验证集validateDataSet、测试集testDataSet
 def processData(df, train_ratio=0.8, validation_ratio=0.1):
@@ -225,6 +223,12 @@ def aggregate_prefixes(prefixes):
 
 # 功能：读取以{数据集}-{xtx}命名文件夹内的train、val数据集，并且处理成便于训练的raw数据，输出到processed-{数据集}-{xtx}文件夹下
 def processRawData(file_dir):
+    if not os.path.isdir(file_dir):
+        print(f"File dir: {file_dir} does not exist.")
+        return
+    else:
+        print(f"Processing: {file_dir}.")
+
     rawDir = file_dir + "-raw"
     if not os.path.isdir(rawDir):
         os.makedirs(rawDir)
@@ -252,11 +256,16 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser('Prepare datasets')
     parser.add_argument("--dn", type=str, required=True, help="data name")
-    parser.add_argument("--rn", type=str, required=True, help="range name")
+    # parser.add_argument("--rn", type=str, required=True, help="range name")
     args = parser.parse_args()
     data_name = args.dn
-    range_name = args.rn
-    processRawData(f"../data/{data_name}-{range_name}")
+    # range_name = args.rn
+    # processRawData(f"../data/{data_name}-{range_name}")
+
+    range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    for rn in range_names:
+        processRawData(f"../data/{data_name}-{rn}")
+
     # prefixes = ["ltl5t20", "ltl20t35", "ltl35t50", "ltl50t65", "ltl65t80", "ltl80t105"]
     # for prefix in prefixes:
     #     print(f"{prefix}:")

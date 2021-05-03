@@ -65,7 +65,7 @@ data_name = args.dn
 range_name = args.rn
 model_dir = "../bestModel"
 checkpoint_path = os.path.join(model_dir, f"{data_name}-{range_name}.pth")
-print(f"Using model: {os.path.basename(checkpoint_path)}")
+print(f"Using model: {checkpoint_path}")
 
 dictionary_dir = config['data_dir'] + "-" + data_name + "-" + range_name
 # dictionary_dir = config['data_dir'] + "-" + args.postfix
