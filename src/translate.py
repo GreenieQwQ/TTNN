@@ -129,6 +129,12 @@ def predict(dn, rn):
         print(f"File: {input_path} not exist.")
         return
 
+    output_filename = f"prediction-{dn}-{rn}.txt"
+    output_path = os.path.join(outputDir, output_filename)
+    if os.path.isfile(output_path):
+        print(f"File {output_path} already exists.")
+        return
+
     # 作用：将src进行index
     preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
     # 作用：将输出逆index为句子
@@ -151,8 +157,7 @@ def predict(dn, rn):
         beam_size=args.beam_size,
         max_seq_len=args.max_seq_len).to(device)
 
-    output_filename = f"prediction-{dn}-{rn}.txt"
-    output_path = os.path.join(outputDir, output_filename)
+
     print(f"Output to {output_path}:")
     with open(output_path, 'w', encoding='utf-8') as outFile:
         with open(input_path, 'r', encoding='utf-8') as inFile:

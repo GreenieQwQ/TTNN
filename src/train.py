@@ -27,7 +27,7 @@ parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
-parser.add_argument('--device', type=str, default='cuda:1' if torch.cuda.is_available() else 'cpu')
+parser.add_argument('--device', type=int, default=0)
 
 parser.add_argument('--print_every', type=int, default=1)
 parser.add_argument('--save_every', type=int, default=1)
@@ -135,6 +135,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data_name = args.dn
     range_name = args.rn
+    args.device = f'cuda:{args.device}' if torch.cuda.is_available() else 'cpu'
     if args.config is not None:
         with open(args.config, encoding='utf-8') as f:
             config = json.load(f)

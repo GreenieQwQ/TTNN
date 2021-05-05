@@ -5,7 +5,7 @@ import pandas as pd
 from tqdm import tqdm
 from runautom import runAutom
 from ltl_model_check import check
-
+from multiprocessing import Process
 parser = argparse.ArgumentParser()
 # parser.add_argument('--pred', required=True,
 #                     help='Path of the prediction.')
@@ -22,6 +22,10 @@ parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
 args = parser.parse_args()
 
+output_dir = f"../eval/{args.dn}-{args.rn}"
+if not os.path.isdir(output_dir):
+    os.makedirs(output_dir)
+print(f"Result at {output_dir}.")
 
 def syntactic_acc(pred: str, gd: str):
     refined_gd = gd.replace("\"", "").replace(",", ";")
@@ -36,13 +40,13 @@ def syntactic_acc(pred: str, gd: str):
 def semantic_acc(pred: str, df):
     # refined_pred = pred.replace(";", ",")
     vocab = [i for i in "abcdefghij"]
-    print(f"Vocab is: {vocab}.")
+    # print(f"Vocab is: {vocab}.")
     return check(df['ltl'], pred, vocab)
     # return runAutom(df['APs'], df['States'],
     #                 df['Transform'], df['Accept'], df['Start'], refined_pred)
 
 
-def evaluate(pred_path, gd_path):
+def evaluate(pred_path, gd_path, output_path):
     print(f"Evaluating at {gd_path}")
     print(f"Prediction at {pred_path}")
     if not os.path.isfile(pred_path):
@@ -85,11 +89,23 @@ def evaluate(pred_path, gd_path):
     # df.to_json(path)
     # print(f"Writing result to {path}.")
 
-    print(f"Total: {total_count}")
-    print(f"Syntactic accuracy: {syntactic_count / total_count}")
-    print(f"Semantic accuracy: {semantic_count / total_count}")
-    print(f"Total accuracy: {(syntactic_count + semantic_count) / total_count}")
-    print(f"[Info] Done at {pred_path}.")
+    result_strs = []
+    def print_and_save(out):
+        print(out)
+        result_strs.append(out)
+
+    output = f"Total: {total_count}"
+    print_and_save(output)
+    output = f"Syntactic accuracy: {syntactic_count / total_count}"
+    print_and_save(output)
+    output = f"Semantic accuracy: {semantic_count / total_count}"
+    print_and_save(output)
+    output = f"Total accuracy: {(syntactic_count + semantic_count) / total_count}"
+    print_and_save(output)
+    output = f"[Info] Done at {pred_path}."
+    print_and_save(output)
+    with open(output_path, 'w', encoding='utf-8') as o:
+        o.writelines([l + '\n' for l in result_strs])
 
 
 if __name__ == "__main__":
@@ -151,11 +167,24 @@ if __name__ == "__main__":
     data_name = args.dn
     range_name = args.rn
     range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    processes = []
     for rn in range_names:
+        output_name = f"{data_name}-{rn}"
+        output_path = os.path.join(output_dir, output_name)
+
         pred_dir = f"../data/prediction-{data_name}-{range_name}"
-        pred_name = f"prediction-{data_name}-{rn}"  # 暂定统一分布 即dn
+        pred_name = f"prediction-{data_name}-{rn}.txt"  # 暂定统一分布 即dn
         pred_path = os.path.join(pred_dir, pred_name)
+
         raw_path = f"../data/{data_name}-{rn}-raw/origin-test.json"
-        evaluate(pred_path, raw_path)
+
+        p = Process(target=evaluate, args=(pred_path, raw_path, output_path))
+        processes.append(p)
+
+    for p in processes:
+        p.start()
+
+    for p in processes:
+        p.join()
     # endfor
     print("[Info] All Done.")

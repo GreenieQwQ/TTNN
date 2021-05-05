@@ -256,15 +256,18 @@ if __name__ == '__main__':
     from argparse import ArgumentParser
     parser = ArgumentParser('Prepare datasets')
     parser.add_argument("--dn", type=str, required=True, help="data name")
-    # parser.add_argument("--rn", type=str, required=True, help="range name")
+    parser.add_argument("--rn", type=str, required=True, help="range name")
+    parser.add_argument("--all", action="store_true", help="process all range")
     args = parser.parse_args()
     data_name = args.dn
-    # range_name = args.rn
-    # processRawData(f"../data/{data_name}-{range_name}")
 
-    range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
-    for rn in range_names:
-        processRawData(f"../data/{data_name}-{rn}")
+    if args.all:
+        range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+        for rn in range_names:
+            processRawData(f"../data/{data_name}-{rn}")
+    else:
+        range_name = args.rn
+        processRawData(f"../data/{data_name}-{range_name}")
 
     # prefixes = ["ltl5t20", "ltl20t35", "ltl35t50", "ltl50t65", "ltl65t80", "ltl80t105"]
     # for prefix in prefixes:

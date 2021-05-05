@@ -18,8 +18,9 @@ parser.add_argument('--val_target', type=str, default='../data/{data_name}-{rang
 # parser.add_argument("--postfix", type=str, required=True)
 parser.add_argument('--save_data_dir', type=str, default='../data/processed-{data_name}-{range_name}')
 parser.add_argument("--dn", type=str, required=True, help="data name")
-# parser.add_argument("--rn", type=str, required=True, help="range name")
+parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument('--share_dictionary', type=bool, default=False)
+parser.add_argument("--all", action="store_true", help="prepare all range")
 
 args = parser.parse_args()
 
@@ -84,7 +85,10 @@ def prepare(data_name, range_name):
 
 if __name__ == "__main__":
     dn = args.dn
-    # rn = args.rn
-    range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
-    for rn in range_names:
+    rn = args.rn
+    if args.all:
+        range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+        for rn in range_names:
+            prepare(dn, rn)
+    else:
         prepare(dn, rn)
