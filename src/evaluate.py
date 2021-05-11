@@ -77,6 +77,10 @@ def evaluate(pred_path, gd_path, output_path):
                 result[i]['state'] = "semantic"
             else:
                 result[i]['state'] = "False"
+            # endif
+
+            if total_count == 100000:
+                break
     # endwith
     # import json
     # f = open(path, 'w')

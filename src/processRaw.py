@@ -63,7 +63,10 @@ def writeData(d, src_path):
                 if isinstance(data['ltl_pre'], str):
                     src.write(data['ltl_pre'].strip().replace("->", "I") + '\n')
                     # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
-                    tgt.write(data['trace'].replace("\"", "").replace(",", ";") + '\n')
+                    try:
+                        tgt.write(data['tgt'].replace("\"", "").replace(",", ";") + '\n')
+                    except IndexError:
+                        tgt.write(data['trace'].replace("\"", "").replace(",", ";") + '\n')
                     origin_index.append(i)
     # endwith
     # write origin json
