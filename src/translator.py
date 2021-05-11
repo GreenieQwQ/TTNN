@@ -81,12 +81,14 @@ class Translator(nn.Module):
         # Get the corresponding positions of the best k candidiates.
         best_k_r_idxs, best_k_c_idxs = best_k_idx_in_k2 // beam_size, best_k_idx_in_k2 % beam_size
         best_k_idx = best_k2_idx[best_k_r_idxs, best_k_c_idxs]
+        done_idx = done[best_k_r_idxs]
+        best_k_idx = best_k_idx.masked_fill(done_idx.view(beam_size), PAD_INDEX)
 
         # Copy the corresponding previous tokens.
         gen_seq[:, :step] = gen_seq[best_k_r_idxs, :step]
         # Set the best tokens in this beam search step
         # when done, add pad index
-        gen_seq[:, step] = best_k_idx.masked_fill(done.view(beam_size), PAD_INDEX)
+        gen_seq[:, step] = best_k_idx
 
         return gen_seq, scores
 
