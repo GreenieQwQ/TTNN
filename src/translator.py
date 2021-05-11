@@ -74,6 +74,11 @@ class Translator(nn.Module):
         # Include the previous scores. Using broadCast
         # scores: shape(beam size, 1) best_k2_probs: shape(beam size, beam size)
         scores = torch.log(best_k2_probs).view(beam_size, -1).masked_fill(done, 0) + scores.view(beam_size, 1)
+        # Notice: done sentence only count once for beam
+        neg_inf = -10000
+        # for done line where pos != 0 add inf to delete
+        neg_inf_mask = (torch.arange(0, beam_size, device=best_k2_probs.device).repeat(beam_size, 1) != 0).logical_and(done)
+        scores = scores + torch.zeros(neg_inf_mask.shape, device=neg_inf_mask.device).masked_fill(neg_inf_mask, neg_inf)
 
         # Get the best k candidates from k^2 candidates.
         scores, best_k_idx_in_k2 = scores.view(-1).topk(beam_size)
