@@ -12,8 +12,8 @@ class TokenCrossEntropyLoss(nn.Module):
     def forward(self, outputs, targets):
         batch_size, seq_len, vocabulary_size = outputs.size()
 
-        outputs_flat = outputs.view(batch_size * seq_len, vocabulary_size)
-        targets_flat = targets.view(batch_size * seq_len)
+        outputs_flat = outputs.reshape(batch_size * seq_len, vocabulary_size)
+        targets_flat = targets.reshape(batch_size * seq_len)
 
         batch_loss = self.base_loss_function(outputs_flat, targets_flat)
 

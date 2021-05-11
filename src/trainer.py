@@ -76,8 +76,12 @@ class EpochSeq2SeqTrainer:
         batch_losses = []
         batch_counts = []
         batch_metrics = []
-        for sources, inputs, targets in tqdm(dataloader):
-            sources, inputs, targets = sources.to(self.device), inputs.to(self.device), targets.to(self.device)
+        # for sources, inputs, targets in tqdm(dataloader):
+        for sources, the_inputs, the_targets in tqdm(dataloader):
+            full_sents = torch.cat([the_inputs, the_targets[:, -1].unsqueeze(1)], dim=1)
+            sources, full_sents = sources.to(self.device), full_sents.to(self.device)
+            inputs, targets = full_sents[:, :-1], full_sents[:, 1:]
+            # sources, inputs, targets = sources.to(self.device), inputs.to(self.device), targets.to(self.device)
             outputs = self.model(sources, inputs)
 
             batch_loss, batch_count = self.loss_function(outputs, targets)

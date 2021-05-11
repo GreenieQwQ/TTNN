@@ -63,11 +63,17 @@ class Translator(nn.Module):
 
         beam_size = self.beam_size
 
+        # done mask
+        done = (gen_seq[:, step-1] == PAD_INDEX).logical_or(gen_seq[:, step-1] == EOS_INDEX).view(beam_size, 1)
+
         # Get k candidates for each beam, k^2 candidates in total.
+        # dec_output: shape(Beam size, genSeqSize, vocabSize)
         best_k2_probs, best_k2_idx = dec_output[:, -1, :].topk(beam_size)
 
-        # Include the previous scores.
-        scores = torch.log(best_k2_probs).view(beam_size, -1) + scores.view(beam_size, 1)
+        # If token is not EOS or PADDING
+        # Include the previous scores. Using broadCast
+        # scores: shape(beam size, 1) best_k2_probs: shape(beam size, beam size)
+        scores = torch.log(best_k2_probs).view(beam_size, -1).masked_fill(done, 0) + scores.view(beam_size, 1)
 
         # Get the best k candidates from k^2 candidates.
         scores, best_k_idx_in_k2 = scores.view(-1).topk(beam_size)
@@ -79,7 +85,8 @@ class Translator(nn.Module):
         # Copy the corresponding previous tokens.
         gen_seq[:, :step] = gen_seq[best_k_r_idxs, :step]
         # Set the best tokens in this beam search step
-        gen_seq[:, step] = best_k_idx
+        # when done, add pad index
+        gen_seq[:, step] = best_k_idx.masked_fill(done.view(beam_size), PAD_INDEX)
 
         return gen_seq, scores
 
