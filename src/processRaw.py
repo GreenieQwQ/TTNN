@@ -61,13 +61,17 @@ def writeData(d, src_path):
             for i in trange(len(df), desc="writing"):
                 data = df.loc[i]
                 if isinstance(data['ltl_pre'], str):
-                    src.write(data['ltl_pre'].strip().replace("->", "I") + '\n')
-                    # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
                     try:
-                        tgt.write(data['tgt'].replace("\"", "").replace(",", ";") + '\n')
+                        target = data['tgt'].replace("\"", "").replace(",", ";")
                     except IndexError:
-                        tgt.write(data['trace'].replace("\"", "").replace(",", ";") + '\n')
-                    origin_index.append(i)
+                        target = data['trace'].replace("\"", "").replace(",", ";")
+                    # end
+                    if len(target) <= 1024:
+                        tgt.write(target + '\n')
+                        src.write(data['ltl_pre'].strip().replace("->", "I") + '\n')
+                        # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
+                        origin_index.append(i)
+                    # endif
     # endwith
     # write origin json
     df.loc[origin_index].reset_index(drop=True).to_json(origin_path)

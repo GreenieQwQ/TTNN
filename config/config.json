@@ -9,7 +9,7 @@
   "nhead": 4,
   "nhid": 512,
   "dropout_prob": 0.1,
-  "lr": 0.0001,
+  "lr": 0.00025,
   "clip_grads": true,
 
   "batch_size": 2,
