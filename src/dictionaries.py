@@ -11,7 +11,7 @@ special_tokens = [PAD_TOKEN, UNK_TOKEN, START_TOKEN, END_TOKEN]
 
 class IndexDictionary:
 
-    def __init__(self, iterable=None, mode='shared', vocabulary_size=None):
+    def __init__(self, iterable=None, mode='shared', vocabulary_size=None, exist_vocab=None):
 
         self.special_tokens = [PAD_TOKEN, UNK_TOKEN, START_TOKEN, END_TOKEN]
 
@@ -19,6 +19,13 @@ class IndexDictionary:
         if iterable is not None:
 
             self.vocab_tokens, self.token_counts = self._build_vocabulary(iterable, vocabulary_size)
+            self.token_index_dict = {token: index for index, token in enumerate(self.vocab_tokens)}
+            self.vocabulary_size = len(self.vocab_tokens)
+
+        # using existed dict
+        if exist_vocab is not None:
+            self.vocab_tokens = exist_vocab
+            self.token_counts = 0
             self.token_index_dict = {token: index for index, token in enumerate(self.vocab_tokens)}
             self.vocabulary_size = len(self.vocab_tokens)
 

@@ -21,6 +21,7 @@ parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument('--share_dictionary', type=bool, default=False)
 parser.add_argument("--all", action="store_true", help="prepare all range")
+parser.add_argument("--ind_dict", action="store_true", help="using independent dict")
 
 args = parser.parse_args()
 
@@ -54,18 +55,19 @@ def prepare(data_name, range_name):
         source_dictionary = IndexDictionary(source_generator, mode='source')
         target_generator = shared_tokens_generator(tokenized_dataset)
         target_dictionary = IndexDictionary(target_generator, mode='target')
-
-        source_dictionary.save(save_data_dir)
-        target_dictionary.save(save_data_dir)
+    elif not args.ind_dict:  # 使用全集
+        src_dict = ['[PAD]', '[CLS]', '[EOS]', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '!', '&', '|', 'I', 'X', 'F', 'G', 'U', 'W', 'R']
+        tgt_dict = ['[PAD]', '[SOS]', '[EOS]', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '&', '|', '(', ')', ';', '{', '}']
+        source_dictionary = IndexDictionary(None, mode='source', exist_vocab=src_dict)
+        target_dictionary = IndexDictionary(None, mode='target', exist_vocab=tgt_dict)
     else:
         source_generator = source_tokens_generator(tokenized_dataset)
         source_dictionary = IndexDictionary(source_generator, mode='source')
         target_generator = target_tokens_generator(tokenized_dataset)
         target_dictionary = IndexDictionary(target_generator, mode='target')
 
-        source_dictionary.save(save_data_dir)
-        target_dictionary.save(save_data_dir)
-
+    source_dictionary.save(save_data_dir)
+    target_dictionary.save(save_data_dir)
     source_dictionary = IndexDictionary.load(save_data_dir, mode='source')
     target_dictionary = IndexDictionary.load(save_data_dir, mode='target')
 

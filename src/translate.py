@@ -16,6 +16,8 @@ parser = ArgumentParser(description='Predict translation')
 parser.add_argument('--source', type=str)
 parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
+parser.add_argument("--tdn", type=str, default="", help="target data name")
+parser.add_argument("--epoch", type=str, default="", help="model epoch")
 parser.add_argument('--beam_size', type=int, default=3)
 parser.add_argument('--max_seq_len', type=int, default=100)
 parser.add_argument('--no_cuda', action='store_true')
@@ -64,7 +66,8 @@ with open(config_path) as f:
 data_name = args.dn
 range_name = args.rn
 model_dir = "../bestModel"
-checkpoint_path = os.path.join(model_dir, f"{data_name}-{range_name}.pth")
+epoch_postfix = ("_" + args.epoch) if args.epoch != "" else ""
+checkpoint_path = os.path.join(model_dir, f"{data_name}-{range_name}{epoch_postfix}.pth")
 print(f"Using model: {checkpoint_path}")
 
 dictionary_dir = config['data_dir'] + "-" + data_name + "-" + range_name
@@ -73,7 +76,7 @@ print(f'Constructing dictionaries from {dictionary_dir}...')
 source_dictionary = IndexDictionary.load(dictionary_dir, mode='source')
 target_dictionary = IndexDictionary.load(dictionary_dir, mode='target')
 # 输出目录
-outputDir = f"../data/prediction-{data_name}-{range_name}"
+outputDir = f"../data/prediction-{data_name}-{range_name}{epoch_postfix}"
 if not os.path.isdir(outputDir):
     os.makedirs(outputDir)
 
@@ -157,7 +160,6 @@ def predict(dn, rn):
         beam_size=args.beam_size,
         max_seq_len=args.max_seq_len).to(device)
 
-
     print(f"Output to {output_path}:")
     with open(output_path, 'w', encoding='utf-8') as outFile:
         with open(input_path, 'r', encoding='utf-8') as inFile:
@@ -188,8 +190,13 @@ def main(dn):
 
 
 if __name__ == "__main__":
+    tdn = args.tdn
     # 对自己分布进行测试
-    main(data_name)
+    if tdn == "":
+        main(data_name)
+    else:   # 对目标分布测试
+        main(tdn)
+    # endif
     # main()
     # 80t105
     # the_input_file = "80t105"

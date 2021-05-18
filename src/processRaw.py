@@ -49,7 +49,7 @@ def preorder(f):
         return result
 
 # usage: write the traces and ltls in df to path
-def writeData(d, src_path):
+def writeData(d, src_path, frac=1):
     # reset index
     df = d.reset_index(drop=True)
     tgt_path = src_path.replace("src", "tgt")
@@ -58,7 +58,7 @@ def writeData(d, src_path):
     origin_index = []
     with open(src_path, 'w', encoding='utf-8') as src:
         with open(tgt_path, 'w', encoding='utf-8') as tgt:
-            for i in trange(len(df), desc="writing"):
+            for i in trange(len(df) * frac, desc="writing"):
                 data = df.loc[i]
                 if isinstance(data['ltl_pre'], str):
                     try:
@@ -229,7 +229,7 @@ def aggregate_prefixes(prefixes):
 
 
 # 功能：读取以{数据集}-{xtx}命名文件夹内的train、val数据集，并且处理成便于训练的raw数据，输出到processed-{数据集}-{xtx}文件夹下
-def processRawData(file_dir):
+def processRawData(file_dir, frac):
     if not os.path.isdir(file_dir):
         print(f"File dir: {file_dir} does not exist.")
         return
@@ -248,11 +248,11 @@ def processRawData(file_dir):
         if f.endswith(".json"):
             df = pd.read_json(path)
             if f.endswith("train.json"):
-                writeData(df, train_path)
+                writeData(df, train_path, frac)
             if f.endswith("val.json"):
-                writeData(df, val_path)
+                writeData(df, val_path, frac)
             if f.endswith("test.json"):
-                writeData(df, test_path)
+                writeData(df, test_path, frac)
         # endif
     # endfor
 
@@ -264,17 +264,19 @@ if __name__ == '__main__':
     parser = ArgumentParser('Prepare datasets')
     parser.add_argument("--dn", type=str, required=True, help="data name")
     parser.add_argument("--rn", type=str, required=True, help="range name")
+    parser.add_argument("--frac", type=float, default=1, help="frac of dataset")
     parser.add_argument("--all", action="store_true", help="process all range")
     args = parser.parse_args()
     data_name = args.dn
 
+    frac = args.frac
     if args.all:
         range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
         for rn in range_names:
-            processRawData(f"../data/{data_name}-{rn}")
+            processRawData(f"../data/{data_name}-{rn}", frac)
     else:
         range_name = args.rn
-        processRawData(f"../data/{data_name}-{range_name}")
+        processRawData(f"../data/{data_name}-{range_name}", frac)
 
     # prefixes = ["ltl5t20", "ltl20t35", "ltl35t50", "ltl50t65", "ltl65t80", "ltl80t105"]
     # for prefix in prefixes:
