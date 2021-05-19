@@ -25,9 +25,9 @@ class IndexDictionary:
         # using existed dict
         if exist_vocab is not None:
             self.vocab_tokens = exist_vocab
-            self.token_counts = 0
             self.token_index_dict = {token: index for index, token in enumerate(self.vocab_tokens)}
             self.vocabulary_size = len(self.vocab_tokens)
+            self.token_counts = [0] * self.vocabulary_size
 
         self.mode = mode
 
@@ -35,6 +35,7 @@ class IndexDictionary:
         try:
             return self.token_index_dict[token]
         except KeyError:
+            print(token)
             return self.token_index_dict[UNK_TOKEN]
 
     def index_to_token(self, index):

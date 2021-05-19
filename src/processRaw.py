@@ -58,12 +58,12 @@ def writeData(d, src_path, frac=1):
     origin_index = []
     with open(src_path, 'w', encoding='utf-8') as src:
         with open(tgt_path, 'w', encoding='utf-8') as tgt:
-            for i in trange(len(df) * frac, desc="writing"):
+            for i in trange(int(len(df) * frac), desc="writing"):
                 data = df.loc[i]
                 if isinstance(data['ltl_pre'], str):
                     try:
                         target = data['tgt'].replace("\"", "").replace(",", ";")
-                    except IndexError:
+                    except KeyError:
                         target = data['trace'].replace("\"", "").replace(",", ";")
                     # end
                     if len(target) <= 1024:
@@ -75,7 +75,7 @@ def writeData(d, src_path, frac=1):
     # endwith
     # write origin json
     df.loc[origin_index].reset_index(drop=True).to_json(origin_path)
-    print(f"Writing to {src_path}...")
+    print(f"Done writing to {src_path}.")
     # endwith
 
 # aggregate data
@@ -237,6 +237,8 @@ def processRawData(file_dir, frac):
         print(f"Processing: {file_dir}.")
 
     rawDir = file_dir + "-raw"
+    # if frac != 1:
+    #     rawDir += f"-{frac}"
     if not os.path.isdir(rawDir):
         os.makedirs(rawDir)
     train_path = os.path.join(rawDir, "src-train.txt")

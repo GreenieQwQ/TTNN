@@ -158,7 +158,10 @@ def predict(dn, rn):
     translator = Translator(
         model=model,
         beam_size=args.beam_size,
-        max_seq_len=args.max_seq_len).to(device)
+        max_seq_len=args.max_seq_len,
+        trg_bos_idx=target_dictionary.token_to_index(START_TOKEN),
+        trg_eos_idx=target_dictionary.token_to_index(END_TOKEN)
+    ).to(device)
 
     print(f"Output to {output_path}:")
     with open(output_path, 'w', encoding='utf-8') as outFile:

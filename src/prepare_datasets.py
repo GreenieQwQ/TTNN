@@ -56,8 +56,9 @@ def prepare(data_name, range_name):
         target_generator = shared_tokens_generator(tokenized_dataset)
         target_dictionary = IndexDictionary(target_generator, mode='target')
     elif not args.ind_dict:  # 使用全集
-        src_dict = ['[PAD]', '[CLS]', '[EOS]', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '!', '&', '|', 'I', 'X', 'F', 'G', 'U', 'W', 'R']
-        tgt_dict = ['[PAD]', '[SOS]', '[EOS]', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '&', '|', '(', ')', ';', '{', '}']
+        print("Using pre-defined dict...")
+        src_dict = ['<PAD>', '<CLS>', '<EOS>', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '!', '&', '|', 'I', 'X', 'F', 'G', 'U', 'W', 'R']
+        tgt_dict = ['<PAD>', '<SOS>', '<EOS>', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', '0', '1', '&', '|', '(', ')', ';', '{', '}']
         source_dictionary = IndexDictionary(None, mode='source', exist_vocab=src_dict)
         target_dictionary = IndexDictionary(None, mode='target', exist_vocab=tgt_dict)
     else:
