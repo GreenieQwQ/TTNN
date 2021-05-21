@@ -56,31 +56,40 @@ def writeData(d, src_path, frac=1):
     # containing the automata
     origin_path = src_path.replace("src", "origin").replace(".txt", ".json")
     origin_index = []
+    is_val_test = "val" in src_path or "test" in src_path
     with open(src_path, 'w', encoding='utf-8') as src:
         with open(tgt_path, 'w', encoding='utf-8') as tgt:
             for i in trange(int(len(df) * frac), desc="writing"):
                 data = df.loc[i]
-                if isinstance(data['ltl_pre'], str):
+                try:
+                    target = data['tgt'].replace("\"", "").replace(",", ";")
+                except KeyError:
                     try:
-                        target = data['tgt'].replace("\"", "").replace(",", ";")
-                    except KeyError:
                         target = data['trace'].replace("\"", "").replace(",", ";")
-                    # end
-                    try:
-                        source = data['ltl_pre'].strip().replace("->", "I")
                     except KeyError:
+                        continue
+                # end
+                try:
+                    source = data['ltl_pre'].strip().replace("->", "I")
+                except KeyError:
+                    try:
                         source = data['src'].strip().replace("->", "I")
-                    # end
-                    if len(target) <= 1024:
-                        tgt.write(target + '\n')
-                        src.write(source + '\n')
-                        # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
-                        origin_index.append(i)
-                    # endif
+                    except KeyError:
+                        continue
+                # end
+                if len(target) <= 1024:
+                    tgt.write(target + '\n')
+                    src.write(source + '\n')
+                    # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
+                    origin_index.append(i)
+                # endif
+                if is_val_test and len(origin_index) >= int(1e5):   # 测试集和验证集优上线
+                    break
+                # endif
     # endwith
     # write origin json
     df.loc[origin_index].reset_index(drop=True).to_json(origin_path)
-    print(f"Done writing to {src_path}.")
+    print(f"Done writing to {src_path}. Qualified index num: {len(origin_index)}.")
     # endwith
 
 # aggregate data

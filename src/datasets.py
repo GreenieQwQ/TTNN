@@ -1,6 +1,7 @@
 from os.path import join, exists
 from os import makedirs
 from dictionaries import START_TOKEN, END_TOKEN
+import pandas as pd
 UNK_INDEX = 1
 
 BASE_DIR = ".."
@@ -206,23 +207,24 @@ class IndexedInputTargetTranslationDataset:
 
     def __init__(self, data_dir, phase, vocabulary_size=None, limit=None):
 
-        self.data = []
+        file_name = join(data_dir, f'indexed-{phase}.txt')
+        self.data = pd.read_table(file_name, header=None)
 
-        unknownify = lambda index: index if index < vocabulary_size else UNK_INDEX
-        with open(join(data_dir, f'indexed-{phase}.txt')) as file:
-            for line in file:
-                sources, inputs, targets = line.strip().split('\t')
-                if vocabulary_size is not None:
-                    indexed_sources = [unknownify(int(index)) for index in sources.strip().split(' ')]
-                    indexed_inputs = [unknownify(int(index)) for index in inputs.strip().split(' ')]
-                    indexed_targets = [unknownify(int(index)) for index in targets.strip().split(' ')]
-                else:
-                    indexed_sources = [int(index) for index in sources.strip().split(' ')]
-                    indexed_inputs = [int(index) for index in inputs.strip().split(' ')]
-                    indexed_targets = [int(index) for index in targets.strip().split(' ')]
-                self.data.append((indexed_sources, indexed_inputs, indexed_targets))
-                if limit is not None and len(self.data) >= limit:
-                    break
+        # unknownify = lambda index: index if index < vocabulary_size else UNK_INDEX
+        # with open(join(data_dir, f'indexed-{phase}.txt')) as file:
+        #     for line in file:
+        #         sources, inputs, targets = line.strip().split('\t')
+        #         if vocabulary_size is not None:
+        #             indexed_sources = [unknownify(int(index)) for index in sources.strip().split(' ')]
+        #             indexed_inputs = [unknownify(int(index)) for index in inputs.strip().split(' ')]
+        #             indexed_targets = [unknownify(int(index)) for index in targets.strip().split(' ')]
+        #         else:
+        #             indexed_sources = [int(index) for index in sources.strip().split(' ')]
+        #             indexed_inputs = [int(index) for index in inputs.strip().split(' ')]
+        #             indexed_targets = [int(index) for index in targets.strip().split(' ')]
+        #         self.data.append((indexed_sources, indexed_inputs, indexed_targets))
+        #         if limit is not None and len(self.data) >= limit:
+        #             break
 
         self.vocabulary_size = vocabulary_size
         self.limit = limit
@@ -230,9 +232,11 @@ class IndexedInputTargetTranslationDataset:
     def __getitem__(self, item):
         if self.limit is not None and item >= self.limit:
             raise IndexError()
-
-        indexed_sources, indexed_inputs, indexed_targets = self.data[item]
-        return indexed_sources, indexed_inputs, indexed_targets
+        def process(indexes):
+            result = indexes.strip().split(' ')
+            return [int(i) for i in result]
+        indexed_sources, indexed_inputs, indexed_targets = self.data.iloc[item]
+        return process(indexed_sources), process(indexed_inputs), process(indexed_targets)
 
     def __len__(self):
         if self.limit is None:

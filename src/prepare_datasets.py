@@ -76,8 +76,9 @@ def prepare(data_name, range_name):
     indexed_translation_dataset = IndexedInputTargetTranslationDataset(save_data_dir, 'train')
     indexed_translation_dataset_on_the_fly = IndexedInputTargetTranslationDatasetOnTheFly('train', source_dictionary,
                                                                                           target_dictionary)
+    # print(indexed_translation_dataset[0])
+    # print(indexed_translation_dataset_on_the_fly[0])
     assert indexed_translation_dataset[0] == indexed_translation_dataset_on_the_fly[0]
-
     print('Done datasets preparation.')
 
     # 注：vocabulary存储的格式为index{\t}token{\t}个数
