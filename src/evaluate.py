@@ -110,7 +110,7 @@ def evaluate(pred_path, gd_path, output_path):
     print_and_save(output)
     output = f"Total accuracy: {(syntactic_count + semantic_count) / total_count}"
     print_and_save(output)
-    output = f"[Info] Done at {pred_path}."
+    output = f"[Info] Done at {pred_path}. Output to {output_path}."
     print_and_save(output)
     with open(output_path, 'w', encoding='utf-8') as o:
         o.writelines([l + '\n' for l in result_strs])

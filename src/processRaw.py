@@ -66,9 +66,14 @@ def writeData(d, src_path, frac=1):
                     except KeyError:
                         target = data['trace'].replace("\"", "").replace(",", ";")
                     # end
+                    try:
+                        source = data['ltl_pre'].strip().replace("->", "I")
+                    except KeyError:
+                        source = data['src'].strip().replace("->", "I")
+                    # end
                     if len(target) <= 1024:
                         tgt.write(target + '\n')
-                        src.write(data['ltl_pre'].strip().replace("->", "I") + '\n')
+                        src.write(source + '\n')
                         # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
                         origin_index.append(i)
                     # endif

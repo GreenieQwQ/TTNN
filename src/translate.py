@@ -22,13 +22,14 @@ parser.add_argument('--beam_size', type=int, default=3)
 parser.add_argument('--max_seq_len', type=int, default=100)
 parser.add_argument('--no_cuda', action='store_true')
 parser.add_argument('--device', type=int, default="0")
+parser.add_argument('--bs', type=int, default=64,
+                    help='Batch size')
 # parser.add_argument('--postfix', type=str, required=True)
 # parser.add_argument('--mode', type=str, required=True)
 # parser.add_argument('--challenge', action="store_true",
 #                     help='Activate challenge mode.')
 # TODO: Batch translation
-# parser.add_argument('-batch_size', type=int, default=30,
-#                    help='Batch size')
+
 # parser.add_argument('-n_best', type=int, default=1,
 #                    help="""If verbose is set, will output the n_best
 #                    decoded sentences""")
@@ -142,7 +143,7 @@ def predict(dn, rn):
     preprocess = IndexedInputTargetTranslationDataset.preprocess(source_dictionary)
     # 作用：将输出逆index为句子
     postprocess = lambda x: ''.join(
-        [token for token in target_dictionary.tokenize_indexes(x) if token != END_TOKEN])
+        [token for token in target_dictionary.tokenize_indexes(x) if token != END_TOKEN and token != START_TOKEN and token != PAD_TOKEN])
     device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
 
     print('Building model...')
@@ -163,16 +164,38 @@ def predict(dn, rn):
         trg_eos_idx=target_dictionary.token_to_index(END_TOKEN)
     ).to(device)
 
+    from utils.pipe import PAD_INDEX
+    def pad_src(batch):
+        sources_lengths = [len(sources) for sources in batch]
+        sources_max_length = max(sources_lengths)
+        sources_padded = [sources + [PAD_INDEX] * (sources_max_length - len(sources)) for sources in batch]
+        sources_tensor = torch.tensor(sources_padded)
+        return sources_tensor
+
+    batch_size = args.bs
     print(f"Output to {output_path}:")
     with open(output_path, 'w', encoding='utf-8') as outFile:
         with open(input_path, 'r', encoding='utf-8') as inFile:
+            seqs = []
             for seq in tqdm(inFile):
                 src_seq = preprocess(seq)
-                pred_seq = translator.translate_sentence(torch.LongTensor([src_seq]).to(device))
-                pred_line = postprocess(pred_seq)
-                pred_line = pred_line.replace(START_TOKEN, '').replace(END_TOKEN, '')
+                seqs.append(src_seq)
+                if len(seqs) >= batch_size:
+                    pred_seq = translator.translate_sentence(pad_src(seqs).to(device))
+                    pred_line = [postprocess(pred) for pred in pred_seq]
+                    # print(pred_line)
+                    outFile.writelines([p.strip() + '\n' for p in pred_line])
+                    seqs.clear()
+                # endif
+            # endfor
+            if seqs:    # last batch
+                pred_seq = translator.translate_sentence(pad_src(seqs).to(device))
+                pred_line = [postprocess(pred).replace(START_TOKEN, '').replace(END_TOKEN, '') for pred in pred_seq]
                 # print(pred_line)
-                outFile.write(pred_line.strip() + '\n')
+                outFile.writelines([p.strip() + '\n' for p in pred_line])
+                seqs.clear()
+        # endwith
+    # endwith
     print(f'[Info] {input_path} Finished.')
 
 

@@ -19,7 +19,7 @@ class EpochSeq2SeqTrainer:
                  loss_function, metric_function, optimizer,
                  logger, run_name,
                  save_config, save_checkpoint,
-                 config):
+                 config, **kwargs):
 
         self.config = config
         self.device = torch.device(self.config['device'])
@@ -35,6 +35,7 @@ class EpochSeq2SeqTrainer:
 
         self.logger = logger
         self.checkpoint_dir = join(BASE_DIR, 'checkpoints', run_name)
+        self.iter_num = kwargs.get("iter_num", int(8e5) / self.config['batch_size'])    # 每次迭代的个数
 
         if not exists(self.checkpoint_dir):
             makedirs(self.checkpoint_dir)
@@ -76,6 +77,7 @@ class EpochSeq2SeqTrainer:
         batch_losses = []
         batch_counts = []
         batch_metrics = []
+        i = 0   # 记录个数
         # for sources, inputs, targets in tqdm(dataloader):
         for sources, the_inputs, the_targets in tqdm(dataloader):
             full_sents = torch.cat([the_inputs, the_targets[:, -1].unsqueeze(1)], dim=1)
@@ -104,6 +106,10 @@ class EpochSeq2SeqTrainer:
             if self.epoch == 0:  # for testing
                 return float('inf'), [float('inf')]
 
+            i += 1
+            if i >= self.iter_num:  # 一次仅迭代80w
+                break
+        # endfor
         epoch_loss = sum(batch_losses) / sum(batch_counts)
         epoch_accuracy = sum(batch_metrics) / sum(batch_counts)
         epoch_perplexity = float(np.exp(epoch_loss))
