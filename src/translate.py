@@ -18,6 +18,7 @@ parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument("--tdn", type=str, default="", help="target data name")
 parser.add_argument("--epoch", type=str, default="", help="model epoch")
+parser.add_argument("--alone", action='store_true')
 parser.add_argument('--beam_size', type=int, default=3)
 parser.add_argument('--max_seq_len', type=int, default=100)
 parser.add_argument('--no_cuda', action='store_true')
@@ -124,6 +125,7 @@ if not os.path.isdir(outputDir):
 #     else:
 #         print('[Info] Random Finished.')
 
+is_proof_process = True
 # 根据dn和rn输出prediction
 def predict(dn, rn):
     dir_name_format = "../data/{dn}-{rn}-raw"
@@ -171,6 +173,17 @@ def predict(dn, rn):
         sources_padded = [sources + [PAD_INDEX] * (sources_max_length - len(sources)) for sources in batch]
         sources_tensor = torch.tensor(sources_padded)
         return sources_tensor
+    def process(seq):
+        seq = seq.strip()
+        def is_proof(name):
+            return name.count("balance") > 0 or name.count("one") > 0
+        if is_proof(data_name) and not is_proof(dn):
+            seq += ",$,1"
+            global is_proof_process
+            if is_proof_process:
+                print("processing")
+                is_proof_process = False
+        return seq
 
     batch_size = args.bs
     print(f"Output to {output_path}:")
@@ -178,6 +191,7 @@ def predict(dn, rn):
         with open(input_path, 'r', encoding='utf-8') as inFile:
             seqs = []
             for seq in tqdm(inFile):
+                seq = process(seq)
                 src_seq = preprocess(seq)
                 seqs.append(src_seq)
                 if len(seqs) >= batch_size:

@@ -47,7 +47,8 @@ def semantic_acc(pred: str, df):
     # refined_pred = pred.replace(";", ",")
     vocab = [i for i in "abcdefghij"]
     # print(f"Vocab is: {vocab}.")
-    return check(df['ltl'], pred, vocab)
+    ltl = df['ltl']
+    return check(ltl, pred, vocab)
     # return runAutom(df['APs'], df['States'],
     #                 df['Transform'], df['Accept'], df['Start'], refined_pred)
 
@@ -55,9 +56,14 @@ def semantic_acc(pred: str, df):
 # 对含有#的进行处理 取#之前的部分
 def processPred(pred: str):
     pred = pred.strip()
-    splitToken = "#"
-    processed = pred.split(splitToken)
-    return processed[0]
+    if pred.count(",") == 0:
+        splitToken = "#"
+        processed = pred.split(splitToken)
+        return processed[0]
+    else:
+        splitToken = ","
+        processed = pred.split(splitToken)
+        return processed[1]
 
 
 def evaluate(pred_path, gd_path, output_path):
@@ -76,14 +82,32 @@ def evaluate(pred_path, gd_path, output_path):
     semantic_count = 0
 
     gd_dataframe = pd.read_json(gd_path)
+    if pred_path.count("balance") > 0:
+        path = gd_path.replace("spot_balance", "spot")
+        ltlDf = pd.read_json(path)
+        print(f"Using ltl df form {path}.")
+    if pred_path.count("one") > 0:
+        path = gd_path.replace("spot_one", "spot")
+        ltlDf = pd.read_json(path)
+        print(f"Using ltl df form {path}.")
+
     result = {}
     with open(pred_path, 'r', encoding='utf-8') as predFile:
         for i, pred in tqdm(enumerate(predFile), desc="Evaluating"):
             pred = processPred(pred)  # important
             total_count += 1
             gd = gd_dataframe.loc[i]
-            result[i] = {'ltl_pre': gd['ltl_pre']}
-            if syntactic_acc(pred, gd['trace']):
+            try:
+                result[i] = {'ltl_pre': gd['ltl_pre']}
+            except KeyError:
+                result[i] = {}
+            try:
+                trace = gd['trace']
+            except KeyError:
+                trace = gd['tgt'].split(',')[1]
+                # 使用另外一个gd获取ltl
+                gd = ltlDf.loc[i]
+            if syntactic_acc(pred, trace):
                 syntactic_count += 1
                 result[i]['state'] = "syntactic"
             elif semantic_acc(pred, gd):

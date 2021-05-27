@@ -28,6 +28,7 @@ parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
 parser.add_argument('--device', type=int, default=0)
+parser.add_argument('--iter_num', type=int, default=int(8e5))
 
 parser.add_argument('--print_every', type=int, default=1)
 parser.add_argument('--save_every', type=int, default=1)
@@ -99,12 +100,14 @@ def run_trainer(config):
         train_dataset,
         batch_size=config['batch_size'],
         shuffle=True,
-        collate_fn=input_target_collate_fn)
+        collate_fn=input_target_collate_fn,
+        num_workers=5)
 
     val_dataloader = DataLoader(
         val_dataset,
         batch_size=config['batch_size'],
-        collate_fn=input_target_collate_fn)
+        collate_fn=input_target_collate_fn,
+        num_workers=5)
 
     loss_function = TokenCrossEntropyLoss()
     accuracy_function = AccuracyMetric()
@@ -122,7 +125,8 @@ def run_trainer(config):
         run_name=run_name,
         save_config=config['save_config'],
         save_checkpoint=config['save_checkpoint'],
-        config=config
+        config=config,
+        iter_num=args.iter_num
     )
 
     trainer.run(config['epochs'])

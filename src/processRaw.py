@@ -56,16 +56,18 @@ def writeData(d, src_path, frac=1):
     # containing the automata
     origin_path = src_path.replace("src", "origin").replace(".txt", ".json")
     origin_index = []
-    is_val_test = "val" in src_path or "test" in src_path
+    is_val, is_test = "val" in src_path, "test" in src_path
+    is_val_test = is_val or is_test
+    is_b_o = "balance" in src_path or "one" in src_path
     with open(src_path, 'w', encoding='utf-8') as src:
         with open(tgt_path, 'w', encoding='utf-8') as tgt:
             for i in trange(int(len(df) * frac), desc="writing"):
                 data = df.loc[i]
                 try:
-                    target = data['tgt'].replace("\"", "").replace(",", ";")
+                    target = data['tgt'].replace("\"", "")
                 except KeyError:
                     try:
-                        target = data['trace'].replace("\"", "").replace(",", ";")
+                        target = data['trace'].replace("\"", "")
                     except KeyError:
                         continue
                 # end
@@ -74,6 +76,9 @@ def writeData(d, src_path, frac=1):
                 except KeyError:
                     try:
                         source = data['src'].strip().replace("->", "I")
+                        # balance和one特化
+                        if is_b_o and is_test and source.count("$") == 0:
+                            continue
                     except KeyError:
                         continue
                 # end

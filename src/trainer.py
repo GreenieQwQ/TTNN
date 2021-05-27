@@ -35,7 +35,7 @@ class EpochSeq2SeqTrainer:
 
         self.logger = logger
         self.checkpoint_dir = join(BASE_DIR, 'checkpoints', run_name)
-        self.iter_num = kwargs.get("iter_num", int(8e5) / self.config['batch_size'])    # 每次迭代的个数
+        self.iter_num = int(kwargs.get("iter_num", int(8e5)) / self.config['batch_size'])    # 每次迭代的个数
 
         if not exists(self.checkpoint_dir):
             makedirs(self.checkpoint_dir)
