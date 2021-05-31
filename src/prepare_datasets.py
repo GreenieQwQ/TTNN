@@ -7,15 +7,10 @@ from utils.pipe import shared_tokens_generator, source_tokens_generator, target_
 import os
 
 parser = ArgumentParser('Prepare datasets')
-# parser.add_argument('--train_source', type=str, default='../data/raw/{prefix}-src-train.txt')
-# parser.add_argument('--train_target', type=str, default='../data/raw/{prefix}-tgt-train.txt')
-# parser.add_argument('--val_source', type=str, default='../data/raw/{prefix}-src-val.txt')
-# parser.add_argument('--val_target', type=str, default='../data/raw/{prefix}-tgt-val.txt')
 parser.add_argument('--train_source', type=str, default='../data/{data_name}-{range_name}-raw/src-train.txt')
 parser.add_argument('--train_target', type=str, default='../data/{data_name}-{range_name}-raw/tgt-train.txt')
 parser.add_argument('--val_source', type=str, default='../data/{data_name}-{range_name}-raw/src-val.txt')
 parser.add_argument('--val_target', type=str, default='../data/{data_name}-{range_name}-raw/tgt-val.txt')
-# parser.add_argument("--postfix", type=str, required=True)
 parser.add_argument('--save_data_dir', type=str, default='../data/processed-{data_name}-{range_name}')
 parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")

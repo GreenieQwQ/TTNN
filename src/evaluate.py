@@ -3,21 +3,9 @@ import os
 
 import pandas as pd
 from tqdm import tqdm
-from runautom import runAutom
 from ltl_model_check import check
 from multiprocessing import Process
 parser = argparse.ArgumentParser()
-# parser.add_argument('--pred', required=True,
-#                     help='Path of the prediction.')
-# parser.add_argument('--src', required=True,
-#                     help='Path of the source.')
-# parser.add_argument('--gd', required=True,
-#                     help='Path of the ground truth.')
-# parser.add_argument('--challenge', action="store_true",
-#                     help='Activate challenge mode.')
-# parser.add_argument('--postfix', required=True,
-#                     help='Model name.')
-# parser.add_argument('--mode', type=str, required=True)
 parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
 parser.add_argument("--tdn", type=str, default="", help="target data name")
@@ -67,10 +55,6 @@ except KeyError:
 def syntactic_acc(pred: str, gd: str):
     refined_gd = gd.replace("\"", "").replace(",", ";")
     result = (pred == refined_gd)
-    # if not result:
-    #     print(f"pred: {pred}")
-    #     print(f"refined_gd: {refined_gd}")
-    #     print()
     return result
 
 
@@ -80,8 +64,6 @@ def semantic_acc(pred: str, df):
     # print(f"Vocab is: {vocab}.")
     ltl = df['ltl']
     return check(ltl, pred, vocab)
-    # return runAutom(df['APs'], df['States'],
-    #                 df['Transform'], df['Accept'], df['Start'], refined_pred)
 
 
 # 对含有#的进行处理 取#之前的部分

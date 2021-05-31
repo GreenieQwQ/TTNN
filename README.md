@@ -1,6 +1,4 @@
-# Model 3.1
-
-Enhancing Neural Temporal Reasoning with Proofs
+# Enhancing Neural Temporal Reasoning with Proofs
 
 ## Requirements
 - Python 3.6+
@@ -12,56 +10,45 @@ Enhancing Neural Temporal Reasoning with Proofs
 ## Usage
 
 ### Prepare datasets
-This repo comes with example data in `data/` directory. To begin, you will need to prepare datasets with given data as follows:
+To begin, you will need to prepare datasets with data in `data/{dataset name}-{range}` directory as follows:
 ```
-$ python processRaw.py
+$ python processRaw.py --dn={dataset name} --rn={range}
 $ python prepare_datasets.py --dn={dataset name} --rn={range}
 ```
-
-The data consists of parallel source (src) and target (tgt) data for training and validation.
-A data file contains one sentence per line with tokens separated by a space.
-Below are the provided example data files.
-
-- `src-train.txt`
-- `tgt-train.txt`
-- `src-val.txt`
-- `tgt-val.txt`
-
-
-### Predict
-To predict a satisfying trace from the source postfix ltl formula:
+The data directory consists of json files end with "train.json", "val.json" and "test.json". An example element is as follows:
 ```
-$ python translate.py --config=../checkpoints/config.json --checkpoint=../checkpoints/bestModel.pth
+{
+    "src": "X0,{;c;c},0",
+    "tgt": "0,{c;c;},0#@,@,@"
+}
 ```
 
-It will give you prediction of the given formula in input path and dump the output at the output path.
-
-Example:
-
-Input file:
+### Train
+To train the model with the specified dataset and range with args in `cofig/config.json`:
 ```
-&UabUa!b
-&&&Ua&bcUa&!bcUa&b!cUa&!b!c
-&&G>aFdW!fWfW!fWfG!f>FcU!c&cW!bWbW!bWbG!b
-&&&&&&&G>&&b!aFaUcaG>aGc>FbU!b&bW!fWfW!fWfG!f>FaU>&cXU!aeXU!a&eFfaFcG>&aFeU!&&!efXU!e&!ed|ec|G!aF&aW!fdG>eG!c
+$  python train --dn={dataset name} --rn={range}
+```
+for more notification about the arguments, simply consult
+```
+$  python train -h
 ```
 
-The output file is as follows:
+### Translate
+To predict a satisfying trace from the ltl formulas in `test.json` using the best model in `bestModel/` (which is retrieved by copying the best model specified in training log and renamed as `{dataset name}-{range}.pth`):
 ```
-&a!b;{1}
-&a!b;b;{1}
-{!a&!f|!f|!c&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&d&!f}
-{!a&!f|!f|!c&d&d&d&d&d&d&d&d&!f}
+$ python translate.py --dn={dataset name} --rn={range} --tdn={target dataset name}
 ```
+
+It will give you the prediction of all range in target dataset and output the prediction at `data/preiction-{dataset name}-{range}`.
 
 ### Evaluate
 
-To evaluate the prediction with the ground truth and the source ltl formula:
+To evaluate the prediction produced by the model mentioned above:
 ```
-$ python evaluate.py --postfix={ModelName}
+$ python evaluate.py --dn={dataset name} --rn={range} --tdn={target dataset name}
 ```
 
-It will output the syntactic accuracy and semantic accuracy.
+It will output the syntactic accuracy and semantic accuracy of prediction at all range of target dataset.
 
 ## References
 

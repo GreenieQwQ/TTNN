@@ -78,32 +78,5 @@ class TransformerModel(nn.Module):
         memory, memory_key_padding_mask = self.encode(sources)
         dec_output = self.decode(targets, memory, memory_key_padding_mask)
         output = self.generate(dec_output)
-        
-        # embedding
-        # src = self.src_embedding(sources)  # (N, S, E)
-        # tgt = self.tgt_embedding(targets)  # (N, T, E)
-        # src = src.transpose(0, 1)  # (S, N, E)
-        # tgt = tgt.transpose(0, 1)  # (T, N, E)
-        #
-        # if src.size(1) != tgt.size(1):
-        #     raise RuntimeError("the batch number of src and tgt must be equal")
-        #
-        # if src.size(2) != self.d_model or tgt.size(2) != self.d_model:
-        #     raise RuntimeError("the feature number of src and tgt must be equal to d_model")
-        #
-        # # get mask
-        # batch_size, sources_len = sources.size()
-        # batch_size, targets_len = targets.size()
-        # # False不变 True Mask
-        # src_key_padding_mask = pad_masking(sources, sources_len)  # (N, S)
-        # tgt_key_padding_mask = pad_masking(targets, targets_len)  # (N, T)
-        # memory_key_padding_mask = src_key_padding_mask  # (N, S)
-        # tgt_mask = subsequent_masking(targets)  # (T, T)
-        #
-        # memory = self.transformer_encoder(src, src_key_padding_mask=src_key_padding_mask)
-        # output = self.transformer_decoder(tgt, memory, tgt_mask=tgt_mask,
-        #                                   tgt_key_padding_mask=tgt_key_padding_mask,
-        #                                   memory_key_padding_mask=memory_key_padding_mask)  # (T, N, E)
-        # output = output.transpose(0, 1)  # (N, T, E)
-        # output = self.generator(output)  # (N, T, FS)
+
         return output
