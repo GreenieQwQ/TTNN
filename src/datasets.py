@@ -209,23 +209,6 @@ class IndexedInputTargetTranslationDataset:
 
         file_name = join(data_dir, f'indexed-{phase}.txt')
         self.data = pd.read_table(file_name, header=None)
-
-        # unknownify = lambda index: index if index < vocabulary_size else UNK_INDEX
-        # with open(join(data_dir, f'indexed-{phase}.txt')) as file:
-        #     for line in file:
-        #         sources, inputs, targets = line.strip().split('\t')
-        #         if vocabulary_size is not None:
-        #             indexed_sources = [unknownify(int(index)) for index in sources.strip().split(' ')]
-        #             indexed_inputs = [unknownify(int(index)) for index in inputs.strip().split(' ')]
-        #             indexed_targets = [unknownify(int(index)) for index in targets.strip().split(' ')]
-        #         else:
-        #             indexed_sources = [int(index) for index in sources.strip().split(' ')]
-        #             indexed_inputs = [int(index) for index in inputs.strip().split(' ')]
-        #             indexed_targets = [int(index) for index in targets.strip().split(' ')]
-        #         self.data.append((indexed_sources, indexed_inputs, indexed_targets))
-        #         if limit is not None and len(self.data) >= limit:
-        #             break
-
         self.vocabulary_size = vocabulary_size
         self.limit = limit
 
