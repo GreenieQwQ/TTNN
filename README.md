@@ -1,10 +1,10 @@
-# TTNN
+# Model 3.1
 
-TEACHING TEMPORAL LOGICS TO NEURAL NETWORKS
+Enhancing Neural Temporal Reasoning with Proofs
 
 ## Requirements
 - Python 3.6+
-- [PyTorch 4.1+](http://pytorch.org/)
+- [PyTorch 1.7+](http://pytorch.org/)
 - [NumPy](http://www.numpy.org/)
 - [tqdm](https://github.com/tqdm/tqdm)
 - [transformers](https://github.com/huggingface/transformers)

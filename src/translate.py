@@ -25,6 +25,7 @@ parser.add_argument('--no_cuda', action='store_true')
 parser.add_argument('--device', type=int, default="0")
 parser.add_argument('--bs', type=int, default=64,
                     help='Batch size')
+parser.add_argument('--pred_num', type=int, default=int(1e5))
 # parser.add_argument('--postfix', type=str, required=True)
 # parser.add_argument('--mode', type=str, required=True)
 # parser.add_argument('--challenge', action="store_true",
@@ -190,7 +191,9 @@ def predict(dn, rn):
     with open(output_path, 'w', encoding='utf-8') as outFile:
         with open(input_path, 'r', encoding='utf-8') as inFile:
             seqs = []
-            for seq in tqdm(inFile):
+            for i, seq in tqdm(enumerate(inFile)):
+                if i >= args.pred_num:
+                    print(f"Done translating: num {i}.")
                 seq = process(seq)
                 src_seq = preprocess(seq)
                 seqs.append(src_seq)
@@ -215,7 +218,7 @@ def predict(dn, rn):
 
 # 功能：对data name里所有的rn进行测试
 def main(dn):
-    range_names = ["5t20", "20t35", "35t50", "50t65", "65t80"]
+    range_names = ["5t20", "20t35", "35t50"]
     from multiprocessing import Process
     processes = []
     for rn in range_names:

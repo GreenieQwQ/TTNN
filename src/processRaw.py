@@ -77,7 +77,7 @@ def writeData(d, src_path, frac=1):
                     try:
                         source = data['src'].strip().replace("->", "I")
                         # balance和one特化
-                        if is_b_o and is_test and source.count("$") == 0:
+                        if is_b_o and is_test and source.count("$") == 0 and not args.ta:
                             continue
                     except KeyError:
                         continue
@@ -287,6 +287,7 @@ if __name__ == '__main__':
     parser.add_argument("--rn", type=str, required=True, help="range name")
     parser.add_argument("--frac", type=float, default=1, help="frac of dataset")
     parser.add_argument("--all", action="store_true", help="process all range")
+    parser.add_argument("--ta", action="store_true", help="test all (including proof)")
     args = parser.parse_args()
     data_name = args.dn
 
