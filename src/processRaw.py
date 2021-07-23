@@ -44,7 +44,7 @@ def writeData(d, src_path, frac=1):
                     # src.write(ltl2prefix(data['ltl'].strip()) + '\n')
                     origin_index.append(i)
                 # endif
-                if is_val_test and len(origin_index) >= int(1e5):   # 测试集和验证集优上线
+                if args.cut and is_val_test and len(origin_index) >= int(1e5) * frac:   # 测试集和验证集优上线
                     break
                 # endif
     # endwith
@@ -78,8 +78,8 @@ def processRawData(file_dir, frac):
         print(f"Processing: {file_dir}.")
 
     rawDir = file_dir + "-raw"
-    # if frac != 1:
-    #     rawDir += f"-{frac}"
+    if frac != 1:
+        rawDir = rawDir.replace("-5t20-raw", "_8w-5t20-raw")
     if not os.path.isdir(rawDir):
         os.makedirs(rawDir)
     train_path = os.path.join(rawDir, "src-train.txt")
@@ -108,6 +108,7 @@ if __name__ == '__main__':
     parser.add_argument("--frac", type=float, default=1, help="frac of dataset")
     parser.add_argument("--all", action="store_true", help="process all range")
     parser.add_argument("--ta", action="store_true", help="test all (including proof)")
+    parser.add_argument("--cut", action="store_true", help="cut val and test set")
     args = parser.parse_args()
     data_name = args.dn
 

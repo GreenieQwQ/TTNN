@@ -18,33 +18,33 @@ import json
 import random
 
 parser = ArgumentParser(description='Train Transformer')
-parser.add_argument('--config', type=str, default="../config/config.json")
-parser.add_argument('--data_dir', type=str, default='../data/processed')
-# parser.add_argument("--postfix", type=str, required=True)
+parser.add_argument('--config', type=str, default="../config/config.json", help="The config file.")
+parser.add_argument('--data_dir', type=str, default='../data/processed', help="Prefix of Data directory to be process.")
 parser.add_argument("--dn", type=str, required=True, help="data name")
 parser.add_argument("--rn", type=str, required=True, help="range name")
+# No need to modify
 parser.add_argument('--save_config', type=str, default=None)
 parser.add_argument('--save_checkpoint', type=str, default=None)
 parser.add_argument('--save_log', type=str, default=None)
 
-parser.add_argument('--device', type=int, default=0)
-parser.add_argument('--iter_num', type=int, default=int(8e5))
+parser.add_argument('--device', type=int, default=0, help="GPU number")
+parser.add_argument('--iter_num', type=int, default=int(8e5), help="Number of sample trained per epoch")
 
-parser.add_argument('--print_every', type=int, default=1)
-parser.add_argument('--save_every', type=int, default=1)
+parser.add_argument('--print_every', type=int, default=1, help="Print every {x} epoch.")
+parser.add_argument('--save_every', type=int, default=1, help="Save every {x} epoch.")
 
-parser.add_argument('--d_model', type=int, default=128)
-parser.add_argument('--nlayers', type=int, default=1)
-parser.add_argument('--nhead', type=int, default=2)
-parser.add_argument('--nhid', type=int, default=128)
-parser.add_argument('--dropout_prob', type=float, default=0.1)
+parser.add_argument('--d_model', type=int, default=128, help="Embedding dimension of tokens")
+parser.add_argument('--nlayers', type=int, default=1, help="Number of decoder/encoder layers in Transformer")
+parser.add_argument('--nhead', type=int, default=2, help="Number of head used in Transformer")
+parser.add_argument('--nhid', type=int, default=128, help="Dimension of fully-connected feed-forward networks")
+parser.add_argument('--dropout_prob', type=float, default=0.1, help="The drop out probability")
 
 parser.add_argument('--optimizer', type=str, default="Adam", choices=["Noam", "Adam"])
-parser.add_argument('--lr', type=float, default=0.001)
-parser.add_argument('--clip_grads', action='store_true')
+parser.add_argument('--lr', type=float, default=0.001, help="Learning rate")
+parser.add_argument('--clip_grads', action='store_true', help="Whether clip gradients")
 
-parser.add_argument('--batch_size', type=int, default=64)
-parser.add_argument('--epochs', type=int, default=100)
+parser.add_argument('--batch_size', type=int, default=64, help="Batch size")
+parser.add_argument('--epochs', type=int, default=100, help="Total epochs of training")
 
 
 def run_trainer(config):

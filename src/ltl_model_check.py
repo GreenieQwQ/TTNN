@@ -217,24 +217,7 @@ def check_file_ltl(fname='t0.json'):
             # if cnt%1000==0:
             print('\rcheck %d, error %d' % (cnt, errcnt), end='')
 
-# exit(0)
-# checkdir='D:\\temps\\Teaching Temporal Logics to Neural Networks-data\\ourdata\\random_trace_nu'
-# cnt=0
-# errcnt=0
-# for fname in os.listdir(checkdir):
-#     with open(os.path.join(checkdir,fname),'r') as f:
-#         datas=json.load(f)
-#         for data in datas:
-#             cnt+=1
-#             # proof=''
-#             if not check(data['ltl'],data['trace'],vocab):
-#                 errcnt+=1
-#                 print(data['ltl'])
-#                 print(data['trace'])
-#                 if errcnt==2:
-#                     exit(0)
-#             # if cnt%1000==0:
-#             print('\rcheck %d, error %d'%(cnt,errcnt),end='')
+
 if __name__ == "__main__":
     # 检查单个公式的
     vocab = [i for i in 'abcdefghij']

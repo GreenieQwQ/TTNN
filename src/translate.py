@@ -10,6 +10,7 @@ import torch
 import os
 from dictionaries import special_tokens, PAD_TOKEN, UNK_TOKEN, START_TOKEN, END_TOKEN
 from tqdm import tqdm
+from multiprocessing import Process
 
 
 parser = ArgumentParser(description='Predict translation')
@@ -23,7 +24,7 @@ parser.add_argument('--beam_size', type=int, default=3)
 parser.add_argument('--max_seq_len', type=int, default=100)
 parser.add_argument('--no_cuda', action='store_true')
 parser.add_argument('--device', type=int, default="0")
-parser.add_argument('--bs', type=int, default=64,
+parser.add_argument('--bs', type=int, default=128,
                     help='Batch size')
 parser.add_argument('--pred_num', type=int, default=int(1e5))
 args = parser.parse_args()
@@ -52,7 +53,7 @@ if not os.path.isdir(outputDir):
 
 is_proof_process = True
 # 根据dn和rn输出prediction
-def predict(dn, rn):
+def predict(dn, rn, device):
     dir_name_format = "../data/{dn}-{rn}-raw"
     dir_name = dir_name_format.format(dn=dn, rn=rn)
     input_path = os.path.join(dir_name, "src-test.txt")
@@ -71,7 +72,6 @@ def predict(dn, rn):
     # 作用：将输出逆index为句子
     postprocess = lambda x: ''.join(
         [token for token in target_dictionary.tokenize_indexes(x) if token != END_TOKEN and token != START_TOKEN and token != PAD_TOKEN])
-    device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
 
     print('Building model...')
     model = TransformerModel(source_dictionary.vocabulary_size, target_dictionary.vocabulary_size,
@@ -101,7 +101,7 @@ def predict(dn, rn):
     def process(seq):
         seq = seq.strip()
         def is_proof(name):
-            return name.count("balance") > 0 or name.count("one") > 0
+            return name.count("balance") > 0 or name.count("one") > 0 or name.count("31") > 0
         if is_proof(data_name) and not is_proof(dn):
             seq += ",$,1"
             global is_proof_process
@@ -116,8 +116,8 @@ def predict(dn, rn):
         with open(input_path, 'r', encoding='utf-8') as inFile:
             seqs = []
             for i, seq in tqdm(enumerate(inFile)):
-                if i >= args.pred_num:
-                    print(f"Done translating: num {i}.")
+                # if i >= args.pred_num:
+                #     print(f"Done translating: num {i}.")
                 seq = process(seq)
                 src_seq = preprocess(seq)
                 seqs.append(src_seq)
@@ -141,12 +141,11 @@ def predict(dn, rn):
 
 
 # 功能：对data name里所有的rn进行测试
-def main(dn):
+def main(dn, device):
     range_names = ["5t20", "20t35", "35t50"]
-    from multiprocessing import Process
     processes = []
     for rn in range_names:
-        p = Process(target=predict, args=(dn, rn))
+        p = Process(target=predict, args=(dn, rn, device))
         processes.append(p)
 
     for p in processes:
@@ -158,9 +157,27 @@ def main(dn):
 
 if __name__ == "__main__":
     tdn = args.tdn
+    import multiprocessing
+    multiprocessing.set_start_method('spawn')
+    device = torch.device(f'cuda:{args.device}' if torch.cuda.is_available() and not args.no_cuda else 'cpu')
     # 对自己分布进行测试
     if tdn == "":
-        main(data_name)
+        main(data_name, device)
+    elif tdn.startswith("other"):    # proof特化
+        tdns = ["rcf-31", "rf-31", "pf-31"]
+        processes = []
+        for td in tdns:
+            p = Process(target=main, args=(td, device))
+            processes.append(p)
+
+        for p in processes:
+            p.start()
+
+        for p in processes:
+            p.join()
+    elif tdn == "ps":  # proof特化
+        tdn = "spot-31"
+        main(tdn, device)
     else:   # 对目标分布测试
-        main(tdn)
+        main(tdn, device)
     # endif
